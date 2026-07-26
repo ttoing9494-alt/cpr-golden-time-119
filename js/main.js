@@ -178,16 +178,26 @@ class AppController {
       if (unlocked) {
         bossBtn.removeAttribute('disabled');
         bossBtn.classList.remove('locked-btn');
+        bossBtn.classList.add('btn-primary');
         bossBtn.style.cursor = 'pointer';
         bossBtn.style.pointerEvents = 'auto';
+        bossBtn.style.background = '';
+        bossBtn.style.color = '';
+        bossBtn.style.border = '';
+        bossBtn.style.filter = '';
         bossBtn.innerHTML = isAdminMode()
           ? `⚡ [ADMIN] 보스전 바로 입장`
           : `⚔️ 보스전 : 생명을 살리는 사랑의 깍지 (입장 가능)`;
       } else {
         bossBtn.setAttribute('disabled', 'true');
+        bossBtn.classList.remove('btn-primary');
         bossBtn.classList.add('locked-btn'); // 미완료 시 회색 비활성화 버튼
         bossBtn.style.cursor = 'not-allowed';
         bossBtn.style.pointerEvents = 'none';
+        bossBtn.style.background = '#334155';
+        bossBtn.style.color = '#94a3b8';
+        bossBtn.style.border = '2px solid #475569';
+        bossBtn.style.filter = 'grayscale(1)';
         bossBtn.innerHTML = `🔒 보스전 (미니게임 3개 완료 필요 - 현재 ${clearedCount}/3 완료)`;
       }
     }
