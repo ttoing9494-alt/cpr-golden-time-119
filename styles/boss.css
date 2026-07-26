@@ -1,0 +1,389 @@
+/* boss.css - Boss Battle "생명을 살리는 사랑의 깍지" & Hall of Fame styles */
+
+.boss-game-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.boss-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--accent-red);
+  padding-bottom: 12px;
+}
+
+.boss-title-tag {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent-orange);
+}
+
+.boss-timer-box {
+  font-size: 15px;
+  font-weight: 700;
+  background: #1e293b;
+  border: 1px solid var(--accent-orange);
+  color: #fdba74;
+  padding: 4px 14px;
+  border-radius: 20px;
+}
+
+.boss-stage-count {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Battle Arena Layout */
+.battle-arena {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: #090e1a;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.boss-avatar-box, .player-vital-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.avatar-frame {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #1e293b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid var(--primary-cyan);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+}
+
+.GrimReaper-boss {
+  border-color: #9333ea;
+  box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+  background: #0f172a;
+}
+
+.GrimReaper-boss.hit-shake {
+  animation: hitShake 0.4s ease;
+}
+
+@keyframes hitShake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-8px, 5px) rotate(-5deg); filter: brightness(2); }
+  40% { transform: translate(8px, -5px) rotate(5deg); }
+  60% { transform: translate(-4px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+
+.reaper-icon {
+  width: 70px;
+  height: 70px;
+}
+
+.hero-icon {
+  font-size: 44px;
+}
+
+.boss-name, .player-name {
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.vs-divider {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--accent-red);
+  font-style: italic;
+}
+
+.hp-bar-outer {
+  width: 100%;
+  height: 14px;
+  background: #1e293b;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid #334155;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.boss-hp { background: linear-gradient(90deg, #9333ea, #ef4444); }
+.player-hp { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+.patient-vital { background: linear-gradient(90deg, #15803d, #22c55e); }
+
+.vital-gauges {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gauge-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gauge-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hp-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Quiz Section */
+.boss-quiz-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quiz-badge {
+  background: rgba(249, 115, 22, 0.2);
+  color: var(--accent-orange);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.boss-question-text {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.boss-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.boss-opt-btn {
+  background: #1e293b;
+  border: 1px solid var(--border-neon);
+  color: var(--text-main);
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.boss-opt-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-orange);
+  transform: translateY(-2px);
+}
+
+.opt-bullet {
+  background: #334155;
+  color: var(--primary-cyan);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.attack-banner {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--accent-green);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.warning-banner {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-red);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* Hall of Fame & Stats */
+.hall-of-fame-wrapper, .achievements-container, .guide-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-title {
+  font-size: 26px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.ranking-table-container {
+  overflow-x: auto;
+}
+
+.hall-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.hall-table th, .hall-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #1e293b;
+}
+
+.hall-table th {
+  background: #0f172a;
+  color: var(--primary-cyan);
+  font-size: 14px;
+}
+
+.hall-table tr:hover {
+  background: rgba(56, 189, 248, 0.05);
+}
+
+.rank-1st { color: #fde047; font-weight: 800; }
+.rank-2nd { color: #cbd5e1; font-weight: 700; }
+.rank-3rd { color: #f97316; font-weight: 700; }
+
+.score-col { color: #fdba74; font-weight: 700; }
+
+/* Achievements Grid */
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.achievement-card {
+  background: #1e293b;
+  border: 1px solid var(--border-neon);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.achievement-card.locked {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.badge-icon {
+  font-size: 32px;
+}
+
+.badge-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.badge-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.badge-status {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+/* Guide Steps Grid */
+.guide-steps-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guide-step-card {
+  position: relative;
+  border-left: 4px solid var(--primary-blue);
+}
+
+.step-num-badge {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary-cyan);
+  background: rgba(56, 189, 248, 0.15);
+  padding: 2px 8px;
+  border-radius: 10px;
+  width: fit-content;
+  margin-bottom: 6px;
+}
+
+.step-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.step-desc {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.step-detail-box {
+  background: #0f172a;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* Form Controls */
+.text-input {
+  font-family: var(--font-family);
+  width: 100%;
+  padding: 12px 16px;
+  background: #0f172a;
+  border: 1px solid var(--border-neon);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 15px;
+  outline: none;
+}
+
+.text-input:focus {
+  border-color: var(--primary-cyan);
+}
+
+.name-input-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}

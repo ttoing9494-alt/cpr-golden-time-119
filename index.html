@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>구조골든타임 119 - 초등 5학년 심폐소생술(CPR) 복습 웹게임</title>
+  <meta name="description" content="초등학생이 자연스럽게 심폐소생술 순서와 응급 판단 능력을 익히는 3D 스타일 반응형 교육용 웹게임">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/minigames.css">
+  <link rel="stylesheet" href="styles/boss.css">
+</head>
+<body>
+
+  <!-- 메인 헤더 / 의료 모니터 상단바 -->
+  <header class="app-header" role="banner">
+    <div class="logo-area" tabIndex="0" aria-label="구조골든타임 119 홈으로">
+      <span class="logo-icon" aria-hidden="true">🫀</span>
+      <h1 class="logo-title">구조골든타임 119</h1>
+    </div>
+
+    <div class="top-user-info">
+      <!-- Firebase Auth 로그인 / 프로필 영역 -->
+      <div id="header-auth-box"></div>
+
+      <div class="gold-badge" aria-label="현재 보유 골드">
+        💰 <span id="user-gold-val">0</span> Gold
+      </div>
+      <button class="btn-icon" data-target-view="guide-view" title="게임 방법 및 CPR 가이드" aria-label="게임 방법 가이드">
+        📖
+      </button>
+
+      <!-- 설정 버튼 -->
+      <button class="btn-icon" id="open-settings-btn" onclick="document.getElementById('settings-modal').classList.remove('hidden')" title="설정" aria-label="게임 설정">
+        ⚙️
+      </button>
+    </div>
+  </header>
+
+  <!-- 토스트 알림 컨테이너 -->
+  <div id="achievement-toast-container" aria-live="polite"></div>
+
+  <!-- 메인 콘텐츠 영역 (SPA View Sections) -->
+  <main class="app-container" role="main">
+
+    <!-- 1. 메인 홈 화면 (home-view) -->
+    <section id="home-view" class="view-section">
+      <div class="hero-banner card-panel">
+        <div class="hero-subtitle">E-EMERGENCY SIMULATION CENTER</div>
+        <h2 class="hero-title">생명을 구하는 사랑의 깍지 CPR 시뮬레이션</h2>
+        <p class="hero-desc">
+          응급구조사 교육생 여러분! 3가지 미니게임을 완료하여 100 Gold를 모으고,<br>
+          영혼을 노리는 어둠의 저승사자에 맞서 <strong>[생명을 살리는 사랑의 깍지]</strong> 보스전에 도전하세요!
+        </p>
+
+        <!-- 네비게이션 메뉴 그리드 -->
+        <div class="nav-menu-grid">
+          <div class="menu-card" data-target-view="guide-view">
+            <div class="menu-icon">📖</div>
+            <div class="menu-name">게임 방법</div>
+          </div>
+          <div class="menu-card" data-target-view="hall-view">
+            <div class="menu-icon">🏆</div>
+            <div class="menu-name">명예의 전당</div>
+          </div>
+          <div class="menu-card" data-target-view="achievements-view">
+            <div class="menu-icon">🏅</div>
+            <div class="menu-name">업적 배지</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 미니게임 카드 목록 -->
+      <h3 class="section-title">🎮 CPR 훈련 미니게임</h3>
+      <div class="game-select-grid">
+        
+        <!-- 미니게임 1 -->
+        <div id="mg1-status-card" class="game-select-card card-panel">
+          <div class="card-badge">미완료 (+30 Gold)</div>
+          <h4 class="card-title">미니게임 1: CPR 순서 맞추기</h4>
+          <p class="card-desc">주변 안전 확인부터 구조대 도착까지 7단계 CPR 올바른 순서를 드래그하여 완성하세요!</p>
+          <button class="btn btn-primary" data-target-view="minigame1-view">게임 시작 ➡️</button>
+        </div>
+
+        <!-- 미니게임 2 -->
+        <div id="mg2-status-card" class="game-select-card card-panel">
+          <div class="card-badge">미완료 (+30 Gold)</div>
+          <h4 class="card-title">미니게임 2: 응급상황 판단 게임</h4>
+          <p class="card-desc">운동장, 체육관, 공원 등 실제 응급상황 카드에서 해서는 안 될 행동과 올바른 판단을 고르세요!</p>
+          <button class="btn btn-primary" data-target-view="minigame2-view">게임 시작 ➡️</button>
+        </div>
+
+        <!-- 미니게임 3 -->
+        <div id="mg3-status-card" class="game-select-card card-panel">
+          <div class="card-badge">미완료 (+40 Gold)</div>
+          <h4 class="card-title">미니게임 3: CPR 리듬 게임</h4>
+          <p class="card-desc">분당 100~120회의 골든 리듬! 스페이스바와 터치로 적정 가슴압박 템포 감각을 익히세요!</p>
+          <button class="btn btn-primary" data-target-view="minigame3-view">게임 시작 ➡️</button>
+        </div>
+
+      </div>
+
+      <!-- 최종 평가 (보스전) 해금 영역 -->
+      <div class="boss-entrance-box card-panel align-center">
+        <h3 class="section-title" style="color: var(--accent-orange)">⚔️ 최종 평가 (보스전)</h3>
+        <p class="section-desc">100 Gold를 수집하면 저승사자에 맞서는 최종 10문제 시뮬레이션 평가가 해금됩니다!</p>
+        <button id="start-boss-btn" class="btn btn-primary btn-large locked-btn" data-target-view="boss-view" disabled>
+          🔒 최종 평가 (100 Gold 필요)
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. 미니게임 1 화면 (minigame1-view) -->
+    <section id="minigame1-view" class="view-section hidden">
+      <div id="mg1-container"></div>
+      <button class="btn btn-secondary" data-target-view="home-view">🏠 메인 화면으로 돌아가기</button>
+    </section>
+
+    <!-- 3. 미니게임 2 화면 (minigame2-view) -->
+    <section id="minigame2-view" class="view-section hidden">
+      <div id="mg2-container"></div>
+      <button class="btn btn-secondary" data-target-view="home-view">🏠 메인 화면으로 돌아가기</button>
+    </section>
+
+    <!-- 4. 미니게임 3 화면 (minigame3-view) -->
+    <section id="minigame3-view" class="view-section hidden">
+      <div id="mg3-container"></div>
+      <button class="btn btn-secondary" data-target-view="home-view">🏠 메인 화면으로 돌아가기</button>
+    </section>
+
+    <!-- 5. 최종 보스전 화면 (boss-view) -->
+    <section id="boss-view" class="view-section hidden">
+      <div id="boss-container"></div>
+      <button class="btn btn-secondary" data-target-view="home-view">🏠 포기하고 돌아가기</button>
+    </section>
+
+    <!-- 6. 명예의 전당 화면 (hall-view) -->
+    <section id="hall-view" class="view-section hidden">
+      <div id="hall-container"></div>
+      <button class="btn btn-secondary" data-target-view="home-view">🏠 메인 화면으로 돌아가기</button>
+    </section>
+
+    <!-- 7. 업적 배지 화면 (achievements-view) -->
+    <section id="achievements-view" class="view-section hidden">
+      <div id="achievements-container"></div>
+      <button class="btn btn-secondary" data-target-view="home-view">🏠 메인 화면으로 돌아가기</button>
+    </section>
+
+    <!-- 8. 게임 방법 및 CPR 지침 가이드 (guide-view) -->
+    <section id="guide-view" class="view-section hidden">
+      <div id="guide-container"></div>
+      <button class="btn btn-secondary" data-target-view="home-view">🏠 메인 화면으로 돌아가기</button>
+    </section>
+
+  </main>
+
+  <!-- Firebase Auth 로그인 선택 모달 -->
+  <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-labelledby="auth-modal-title">
+    <div class="modal-content card-panel align-center">
+      <h3 id="auth-modal-title" class="modal-title">🔑 구조사 로그인 선택</h3>
+      <p class="section-desc" style="margin-bottom: 20px;">
+        로그인하여 나의 점수와 구조 기록을 온라인 명예의 전당 클라우드 DB에 동기화해보세요!
+      </p>
+      
+      <div class="auth-btn-group" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+        <button id="google-login-btn" class="btn btn-primary btn-large">
+          <span style="font-size: 22px;">🌐</span> Google 계정으로 1초 로그인
+        </button>
+        <button id="anon-login-btn" class="btn btn-secondary btn-large">
+          <span style="font-size: 22px;">👤</span> 게스트 익명으로 빠르게 로그인
+        </button>
+      </div>
+
+      <div class="btn-group align-center" style="margin-top: 20px;">
+        <button class="btn btn-secondary modal-close-btn">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설정 모달 -->
+  <div id="settings-modal" class="modal-overlay hidden" role="dialog" aria-labelledby="setting-modal-title">
+    <div class="modal-content card-panel">
+      <h3 id="setting-modal-title" class="modal-title">⚙️ 게임 설정</h3>
+      <div class="modal-body">
+        <div class="setting-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <label for="setting-sfx" style="font-weight: 700;">🔊 효과음 (SFX)</label>
+          <input type="checkbox" id="setting-sfx" style="width: 20px; height: 20px;" checked>
+        </div>
+        <div class="setting-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <label for="setting-bgm" style="font-weight: 700;">🎵 배경음악 (BGM)</label>
+          <input type="checkbox" id="setting-bgm" style="width: 20px; height: 20px;" checked>
+        </div>
+        <hr style="border-color: var(--border-neon); margin-bottom: 20px;">
+        <button id="reset-progress-btn" class="btn btn-secondary" style="width: 100%; color: var(--accent-red);">
+          🔄 게임 진행 및 골드 초기화
+        </button>
+      </div>
+      <div class="btn-group align-center">
+        <button class="btn btn-primary modal-close-btn">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
