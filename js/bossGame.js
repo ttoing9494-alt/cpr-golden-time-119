@@ -202,7 +202,7 @@ import { storage export class BossGame {
             <!-- 닥터 히어로 AED 파동 이동 필드 -->
             <div class="hero-shooting-field">
               <div id="arcade-hero-ship" class="hero-ship-box" style="left: ${this.heroPosPercent}%;">
-                <img src="./assets/3d_doctor_hero.jpg" alt="3D 응급 히어로" class="hero-ship-img glow-lvl-${Math.min(this.correctCount, 5)}">
+                <img src="./assets/3d_doctor_hero.jpg" alt="응급 히어로" class="hero-ship-img glow-lvl-${Math.min(this.correctCount, 5)}">
                 <div class="hero-ship-label">🩺 응급 히어로 (Lv.${heroLevel})</div>
                 <div class="aed-cannon-glow">⚡ AED 발사대</div>
               </div>
