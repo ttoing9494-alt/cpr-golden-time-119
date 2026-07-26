@@ -82,12 +82,15 @@ export class Minigame1 {
 
         <h3 class="sub-section-title">📦 섞여있는 순서 카드 목록</h3>
         <div class="cpr-source-pool" id="source-pool">
-          ${this.shuffledSteps.map(step => `
+          ${this.shuffledSteps.map(step => {
+            // 번호("1. ", "2. " 등) 제거하여 힌트 방지
+            const titleNoNum = step.title.replace(/^\d+\.\s*/, '');
+            return `
             <div class="cpr-card" draggable="true" data-id="${step.id}">
-              <div class="card-title">${step.title}</div>
+              <div class="card-title">${titleNoNum}</div>
               <div class="card-desc">${step.desc}</div>
             </div>
-          `).join('')}
+          `}).join('')}
         </div>
 
         <div class="btn-group align-center">

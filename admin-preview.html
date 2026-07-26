@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[비공개] 보스전 문제 미리보기 - 관리자 전용</title>
+  <link rel="stylesheet" href="./styles/main.css">
+  <style>
+    body { background: #0b1727; }
+    .preview-wrap { max-width: 820px; margin: 40px auto; padding: 20px; }
+    .preview-header {
+      background: #dc2626;
+      color: #fff;
+      padding: 20px 28px;
+      border-radius: 16px 16px 0 0;
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .preview-header h1 { font-size: 22px; font-weight: 900; }
+    .preview-header .lock { font-size: 30px; }
+    .quiz-item {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    .quiz-num {
+      display: inline-block;
+      background: #1e3a8a;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .quiz-type-tag {
+      display: inline-block;
+      background: #fee2e2;
+      color: #dc2626;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+    .quiz-q {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .options-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .opt-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .opt-row.correct-ans {
+      background: #dcfce7;
+      border-color: #16a34a;
+      color: #15803d;
+      font-weight: 900;
+    }
+    .opt-idx {
+      background: #0f172a;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .opt-row.correct-ans .opt-idx { background: #16a34a; }
+    .answer-box {
+      background: #eff6ff;
+      border-left: 4px solid #1e3a8a;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #1e3a8a;
+      line-height: 1.6;
+    }
+    .answer-label { font-weight: 900; color: #dc2626; }
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      background: #dc2626;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .back-btn:hover { background: #b91c1c; }
+    .type-map { font-size: 12px; font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="preview-wrap">
+  <a href="./index.html" class="back-btn">← 게임 메인으로 돌아가기</a>
+  <div class="preview-header">
+    <span class="lock">🔐</span>
+    <div>
+      <h1>보스전 문제 관리자 미리보기</h1>
+      <p style="font-size: 14px; opacity: 0.85; margin-top: 4px;">이 페이지는 비공개입니다. 학생들과 공유하지 마세요!</p>
+    </div>
+  </div>
+
+  <div id="quiz-list" style="margin-top: 18px;"></div>
+</div>
+
+<script type="module">
+  import { BOSS_QUIZZES } from './js/cprData.js';
+
+  const container = document.getElementById('quiz-list');
+
+  const typeLabels = {
+    'choice': '객관식',
+    'ox': 'OX 퀴즈',
+    'order': '순서 배열',
+    'situation': '상황 판단'
+  };
+
+  BOSS_QUIZZES.forEach((q, i) => {
+    const typeLabel = typeLabels[q.type] || q.type;
+    const div = document.createElement('div');
+    div.className = 'quiz-item';
+
+    div.innerHTML = `
+      <div>
+        <span class="quiz-num">${i + 1}번 문제</span>
+        <span class="quiz-type-tag">${typeLabel}</span>
+      </div>
+      <div class="quiz-q">${q.question}</div>
+      <div class="options-list">
+        ${q.options.map((opt, idx) => `
+          <div class="opt-row ${idx === q.answer ? 'correct-ans' : ''}">
+            <div class="opt-idx">${idx + 1}</div>
+            <span>${opt} ${idx === q.answer ? '✅ <strong>[정답]</strong>' : ''}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="answer-box">
+        <span class="answer-label">💡 정답 해설:</span>
+        ${q.explanation}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+</script>
+</body>
+</html>

@@ -44,33 +44,74 @@
 
     <!-- 1. 메인 홈 화면 (home-view) -->
     <section id="home-view" class="view-section">
-      <div class="hero-banner card-panel">
-        <div class="hero-subtitle">E-EMERGENCY SIMULATION CENTER</div>
-        <h2 class="hero-title">생명을 구하는 사랑의 깍지 CPR 시뮬레이션</h2>
-        <p class="hero-desc">
-          응급구조사 교육생 여러분! 3가지 미니게임을 완료하여 100 Gold를 모으고,<br>
-          영혼을 노리는 어둠의 저승사자에 맞서 <strong>[생명을 살리는 사랑의 깍지]</strong> 보스전에 도전하세요!
-        </p>
 
-        <!-- 네비게이션 메뉴 그리드 -->
-        <div class="nav-menu-grid">
-          <div class="menu-card" data-target-view="guide-view">
-            <div class="menu-icon">📖</div>
-            <div class="menu-name">게임 방법</div>
+      <!-- ★ 히어로 배너: 풀스크린 남색 배경 + 흰색 텍스트 + 빨간 포인트 -->
+      <div class="hero-section">
+        <div class="hero-top-strip">🚨 심폐소생술(CPR) 응급구조 교육 시뮬레이션</div>
+
+        <div class="hero-main-content">
+          <div class="hero-left">
+            <div class="hero-heart-icon">🫀</div>
+            <h2 class="hero-big-title">
+              구조<span class="red-text">골든타임</span><br>
+              <span class="hero-sub-line">119</span>
+            </h2>
+            <p class="hero-tagline">
+              3가지 미니게임을 완료하고 100 Gold를 모아<br>
+              <strong class="red-text">저승사자</strong>에 맞서는 보스전에 도전하세요!
+            </p>
+            <div class="hero-cta-row">
+              <div class="menu-card hero-menu-card" data-target-view="guide-view">
+                <span class="menu-icon">📖</span>
+                <span class="menu-name">게임 방법</span>
+              </div>
+              <div class="menu-card hero-menu-card" data-target-view="hall-view">
+                <span class="menu-icon">🏆</span>
+                <span class="menu-name">명예의 전당</span>
+              </div>
+              <div class="menu-card hero-menu-card" data-target-view="achievements-view">
+                <span class="menu-icon">🏅</span>
+                <span class="menu-name">업적 배지</span>
+              </div>
+            </div>
           </div>
-          <div class="menu-card" data-target-view="hall-view">
-            <div class="menu-icon">🏆</div>
-            <div class="menu-name">명예의 전당</div>
-          </div>
-          <div class="menu-card" data-target-view="achievements-view">
-            <div class="menu-icon">🏅</div>
-            <div class="menu-name">업적 배지</div>
+
+          <div class="hero-right">
+            <div class="hero-ecg-card">
+              <div class="ecg-label">VITAL MONITOR</div>
+              <div class="ecg-pulse-visual">
+                <svg viewBox="0 0 200 60" class="ecg-svg">
+                  <polyline points="0,30 30,30 40,5 50,55 60,30 90,30 100,10 110,50 120,30 150,30 160,8 170,52 180,30 200,30"
+                    fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="ecg-stats-row">
+                <div class="ecg-stat"><span class="stat-n">100</span><span class="stat-u">-120 BPM</span><span class="stat-l">권장 압박 속도</span></div>
+                <div class="ecg-divider"></div>
+                <div class="ecg-stat"><span class="stat-n">5cm</span><span class="stat-u">깊이</span><span class="stat-l">가슴압박 깊이</span></div>
+                <div class="ecg-divider"></div>
+                <div class="ecg-stat red-stat"><span class="stat-n">4분</span><span class="stat-u"></span><span class="stat-l">골든타임</span></div>
+              </div>
+            </div>
+
+            <div class="cpr-steps-mini">
+              <div class="steps-title">CPR 7단계 핵심 순서</div>
+              ${[
+                '① 주변 안전 확인',
+                '② 의식 확인',
+                '③ 119 신고 & AED 요청',
+                '④ 호흡 확인',
+                '⑤ 가슴압박 실시',
+                '⑥ AED 사용',
+                '⑦ 구조대 도착까지 계속'
+              ].map((s, i) => `<div class="step-mini-row"><span class="step-mini-dot ${i===4?'red-dot':''}"></span>${s}</div>`).join('')}
+            </div>
           </div>
         </div>
       </div>
 
       <!-- 미니게임 카드 목록 -->
-      <h3 class="section-title">🎮 CPR 훈련 미니게임</h3>
+      <h3 class="section-title">🎮 CPR 훈련 미니게임 (Gold 수집하기)</h3>
       <div class="game-select-grid">
         
         <!-- 미니게임 1 -->
@@ -101,13 +142,14 @@
 
       <!-- 최종 평가 (보스전) 해금 영역 -->
       <div class="boss-entrance-box card-panel align-center">
-        <h3 class="section-title" style="color: var(--accent-orange)">⚔️ 최종 평가 (보스전)</h3>
-        <p class="section-desc">100 Gold를 수집하면 저승사자에 맞서는 최종 10문제 시뮬레이션 평가가 해금됩니다!</p>
+        <h3 class="section-title" style="color: var(--color-red-primary)">⚔️ 최종 평가 : 생명을 살리는 사랑의 깍지</h3>
+        <p class="section-desc">100 Gold를 수집하면 어둠의 저승사자에 맞서는 최종 10문제 시뮬레이션 보스전이 해금됩니다!</p>
         <button id="start-boss-btn" class="btn btn-primary btn-large locked-btn" data-target-view="boss-view" disabled>
           🔒 최종 평가 (100 Gold 필요)
         </button>
       </div>
     </section>
+
 
     <!-- 2. 미니게임 1 화면 (minigame1-view) -->
     <section id="minigame1-view" class="view-section hidden">

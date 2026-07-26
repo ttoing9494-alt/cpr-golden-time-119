@@ -1,9 +1,9 @@
-/* minigames.css - Specific styles for Minigames 1, 2, and 3 */
+/* minigames.css - White, Navy, Red theme for Minigames 1, 2, and 3 */
 
 .minigame-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
 .minigame-header {
@@ -11,132 +11,127 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  border-bottom: 1px solid var(--border-neon);
-  padding-bottom: 14px;
+  gap: 12px;
+  border-bottom: 2px solid var(--color-navy-dark);
+  padding-bottom: 16px;
 }
 
 .game-badge {
-  background: var(--primary-blue);
+  background: var(--color-red-primary);
   color: #fff;
   font-size: 13px;
-  font-weight: 700;
-  padding: 4px 12px;
+  font-weight: 800;
+  padding: 4px 14px;
   border-radius: 20px;
 }
 
 .game-title {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--color-navy-dark);
 }
 
 .timer-box {
   font-size: 16px;
-  font-weight: 700;
-  background: #1e293b;
-  padding: 6px 16px;
+  font-weight: 800;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 6px 18px;
   border-radius: 20px;
+  color: var(--color-navy-dark);
 }
 
 .timer-val {
-  color: var(--primary-cyan);
+  color: var(--color-red-primary);
   font-size: 18px;
 }
 
-.timer-warning {
-  color: var(--accent-red) !important;
-  animation: blink 0.6s infinite alternate;
-}
-
-@keyframes blink {
-  from { opacity: 1; }
-  to { opacity: 0.3; }
-}
-
 .game-instruction {
-  background: rgba(56, 189, 248, 0.1);
-  border-left: 4px solid var(--primary-cyan);
-  padding: 12px 16px;
-  border-radius: 6px;
+  background: #eff6ff;
+  border-left: 5px solid var(--color-navy-accent);
+  padding: 14px 18px;
+  border-radius: 8px;
   font-size: 15px;
+  color: var(--color-navy-dark);
+  line-height: 1.6;
 }
 
 /* === Minigame 1: Drag & Drop Slots === */
 .cpr-target-slots {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .slot-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .slot-num {
-  font-weight: 800;
-  color: var(--primary-cyan);
-  min-width: 70px;
-  font-size: 15px;
+  font-weight: 900;
+  color: var(--color-red-primary);
+  min-width: 75px;
+  font-size: 16px;
 }
 
 .slot-content {
   flex: 1;
-  min-height: 52px;
-  border: 2px dashed #334155;
+  min-height: 56px;
+  border: 2px dashed #cbd5e1;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
-  padding: 8px 14px;
-  background: rgba(15, 23, 42, 0.5);
+  padding: 8px 16px;
+  background: #f8fafc;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .slot-content.drag-over {
-  border-color: var(--primary-cyan);
-  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--color-red-primary);
+  background: var(--color-red-light);
 }
 
 .slot-content.has-card {
   border-style: solid;
-  border-color: var(--primary-blue);
-  background: var(--bg-card);
+  border-color: var(--color-navy-accent);
+  background: var(--color-white);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .slot-placeholder {
-  color: #64748b;
+  color: #94a3b8;
   font-size: 14px;
+  font-weight: 600;
 }
 
 .cpr-source-pool {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
 }
 
 .cpr-card {
-  background: #1e293b;
-  border: 1px solid var(--border-neon);
+  background: var(--color-white);
+  border: 2px solid #e2e8f0;
   border-radius: var(--radius-md);
-  padding: 12px 16px;
+  padding: 14px 18px;
   cursor: grab;
   user-select: none;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .cpr-card:hover:not(.used) {
   transform: translateY(-2px);
-  border-color: var(--primary-cyan);
-}
-
-.cpr-card.dragging {
-  opacity: 0.5;
+  border-color: var(--color-red-primary);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.15);
 }
 
 .cpr-card.used {
-  opacity: 0.3;
+  opacity: 0.35;
   cursor: not-allowed;
   filter: grayscale(1);
 }
@@ -149,68 +144,76 @@
 }
 
 .sub-section-title {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-navy-dark);
   margin-top: 10px;
 }
 
 /* === Minigame 2: Judgment Quiz === */
 .quiz-progress-bar {
-  height: 8px;
-  background: #1e293b;
-  border-radius: 4px;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 5px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: var(--primary-cyan);
+  background: linear-gradient(90deg, var(--color-navy-accent), var(--color-red-primary));
   transition: width 0.3s ease;
 }
 
 .quiz-step-count {
   font-size: 14px;
-  color: var(--text-muted);
+  font-weight: 700;
+  color: var(--color-text-muted);
   text-align: right;
 }
 
 .situation-card {
-  background: rgba(2, 132, 199, 0.15);
-  border: 1px solid var(--primary-blue);
+  background: #eff6ff;
+  border: 2px solid var(--color-navy-accent);
   border-radius: var(--radius-md);
-  padding: 18px;
+  padding: 20px;
   display: flex;
   gap: 16px;
   align-items: center;
 }
 
 .situation-icon {
-  font-size: 32px;
+  font-size: 36px;
 }
 
 .situation-text h4 {
-  color: var(--primary-cyan);
-  font-size: 14px;
+  color: var(--color-navy-dark);
+  font-size: 15px;
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
 .question-title-box {
   text-align: center;
-  padding: 12px 0;
+  padding: 14px 0;
 }
 
 .question-text {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--color-navy-dark);
 }
 
 .options-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .option-btn {
+  background: var(--color-navy-dark);
+  border: 2px solid var(--color-navy-dark);
+  border-radius: var(--radius-lg);
+  padding: 18px;
   text-align: left;
   cursor: pointer;
   display: flex;
@@ -218,81 +221,95 @@
   gap: 14px;
   transition: all 0.2s ease;
   font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
 }
 
 .option-btn:hover {
-  border-color: var(--primary-cyan);
-  background: var(--bg-card-hover);
+  border-color: var(--color-red-primary);
+  background: var(--color-red-primary);
+  color: #ffffff;
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
 }
 
 .opt-num {
-  background: var(--primary-blue);
+  background: var(--color-red-primary);
   color: #fff;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
+  font-weight: 900;
   flex-shrink: 0;
 }
 
 .explanation-box {
-  background: #0f172a;
+  background: #f8fafc;
   border-radius: var(--radius-md);
-  padding: 16px;
-  margin-top: 12px;
-  font-size: 14px;
+  padding: 18px;
+  margin-top: 14px;
+  font-size: 15px;
   line-height: 1.6;
+  color: var(--color-navy-dark);
 }
 
-.success-box { border-left: 4px solid var(--accent-green); }
-.warning-box { border-left: 4px solid var(--accent-orange); }
+.success-box { border-left: 5px solid var(--color-green-success); }
+.warning-box { border-left: 5px solid var(--color-red-primary); }
 
 .gold-reward-animation {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin: 16px 0;
-  font-size: 24px;
-  font-weight: 800;
-  color: #fdba74;
+  margin: 18px 0;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--color-red-primary);
 }
 
 /* === Minigame 3: Rhythm CPR Game === */
 .rhythm-monitor-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   align-items: center;
+  background: #0f172a;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  color: #fff;
 }
 
 .bpm-display-box {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
-.bpm-num {
-  font-size: 36px;
-  font-weight: 900;
-  color: var(--primary-cyan);
-}
-
-.rhythm-tag {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 14px;
+.bpm-label {
+  color: #94a3b8;
   font-weight: 700;
 }
 
-.tag-perfect { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
-.tag-good { background: rgba(56, 189, 248, 0.2); color: var(--primary-cyan); }
-.tag-slow { background: rgba(249, 115, 22, 0.2); color: var(--accent-orange); }
-.tag-fast { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+.bpm-num {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--color-red-primary);
+}
+
+.rhythm-tag {
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.tag-perfect { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.tag-good { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.tag-slow { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+.tag-fast { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
 .gauge-container {
   width: 100%;
@@ -300,22 +317,22 @@
 }
 
 .gauge-bar {
-  height: 24px;
+  height: 26px;
   background: #1e293b;
-  border-radius: 12px;
+  border-radius: 13px;
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--border-neon);
+  border: 2px solid #334155;
 }
 
 .target-zone {
   position: absolute;
-  left: 55.5%; /* 100~120 BPM mapping on 0~180 scale */
+  left: 55.5%;
   width: 11.1%;
   height: 100%;
   background: rgba(34, 197, 94, 0.4);
-  border-left: 2px solid var(--accent-green);
-  border-right: 2px solid var(--accent-green);
+  border-left: 2px solid #22c55e;
+  border-right: 2px solid #22c55e;
 }
 
 .gauge-pointer {
@@ -324,7 +341,7 @@
   left: 0;
   width: 6px;
   height: 100%;
-  background: var(--text-main);
+  background: #fff;
   box-shadow: 0 0 10px #fff;
   transition: left 0.1s ease-out;
 }
@@ -333,61 +350,64 @@
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
+  color: #94a3b8;
+  margin-top: 6px;
 }
 
-.perfect-label { color: var(--accent-green); font-weight: 700; }
+.perfect-label { color: #4ade80; font-weight: 800; }
 
 #rhythm-canvas {
   width: 100%;
   max-width: 600px;
   height: 120px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-neon);
+  border: 1px solid #334155;
 }
 
 .press-action-area {
   display: flex;
   justify-content: center;
-  margin: 10px 0;
+  margin: 12px 0;
 }
 
 .press-heart-btn {
   width: 100%;
-  max-width: 400px;
-  height: 90px;
-  border-radius: 45px;
-  background: linear-gradient(135deg, #dc2626, #f97316);
+  max-width: 420px;
+  height: 95px;
+  border-radius: 48px;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
   border: none;
   color: #fff;
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 900;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+  gap: 16px;
+  box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
   transition: transform 0.05s ease;
 }
 
 .press-heart-btn:active, .press-heart-btn.pressed {
   transform: scale(0.94);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.6);
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.6);
 }
 
 .heart-pulse-icon {
-  font-size: 32px;
+  font-size: 36px;
 }
 
 .live-stats {
   display: flex;
   justify-content: space-around;
   font-size: 16px;
-  background: #0f172a;
-  padding: 12px;
+  font-weight: 700;
+  background: #f8fafc;
+  padding: 14px;
   border-radius: var(--radius-md);
+  border: 1px solid #e2e8f0;
+  color: var(--color-navy-dark);
 }
 
 .accuracy-score-display {
@@ -398,11 +418,11 @@
 .score-label {
   display: block;
   font-size: 16px;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
 }
 
 .score-val {
-  font-size: 56px;
+  font-size: 60px;
   font-weight: 900;
-  color: var(--accent-green);
+  color: var(--color-red-primary);
 }
