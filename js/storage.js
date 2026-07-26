@@ -31,7 +31,19 @@ export const storage = {
   },
 
   // 2. 게임 진행도 & 골드
+  initSession() {
+    try {
+      if (!sessionStorage.getItem('cpr_active_session')) {
+        sessionStorage.setItem('cpr_active_session', 'true');
+        this.resetProgress();
+      }
+    } catch (e) {
+      console.warn('SessionStorage error:', e);
+    }
+  },
+
   getProgress() {
+    this.initSession();
     try {
       const data = localStorage.getItem(STORAGE_KEYS.GAME_PROGRESS);
       return data ? JSON.parse(data) : {
