@@ -74,7 +74,7 @@ export class Minigame1 {
             <div class="slot-item" data-slot="${idx}">
               <div class="slot-num">${num}단계</div>
               <div class="slot-content" data-index="${idx}">
-                <span class="slot-placeholder">이곳으로 드래그하거나 선택하세요</span>
+                <span class="slot-placeholder">이곳으로 드래그해주세요</span>
               </div>
             </div>
           `).join('')}
