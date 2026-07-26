@@ -161,19 +161,19 @@ import { storage export class BossGame {
 
         <!-- 3D 보스전 아케이드 아레나 -->
         <div class="battle-arena battleground-3d-arena arcade-arena-box">
-          <!-- 1. 친근한 저승사자 (보스) 영역 -->
+          <!-- 1. 저승사자 보스 영역 -->
           <div class="boss-avatar-box reaper-boss-box">
             <div class="avatar-frame GrimReaper-boss 3d-boss-frame">
               <div class="char-3d-wrapper">
-                <img src="./assets/3d_devil_boss.jpg" alt="친근한 3D 저승사자" class="char-3d-img boss-3d-render ${this.bossHP < 40 ? 'boss-damaged-effect' : ''}">
+                <img src="./assets/3d_devil_boss.jpg" alt="3D 저승사자 보스" class="char-3d-img boss-3d-render ${this.bossHP < 40 ? 'boss-damaged-effect' : ''}">
                 <div class="boss-flame-aura"></div>
               </div>
-              <div class="boss-name">👻 친근한 저승사자 <span class="boss-status-tag">${bossStatus}</span></div>
+              <div class="boss-name">👻 저승사자 보스 <span class="boss-status-tag">${bossStatus}</span></div>
             </div>
             <div class="hp-bar-outer hud-hp-outer">
               <div id="boss-hp-fill" class="hp-bar-fill boss-hp" style="width: ${this.bossHP}%"></div>
             </div>
-            <div class="hp-text">저승사자 해마 게이지: <span id="boss-hp-val">${this.bossHP}</span> / 100</div>
+            <div class="hp-text">저승사자 게이지: <span id="boss-hp-val">${this.bossHP}</span> / 100</div>
           </div>
 
           <!-- 2. 중앙 아케이드 슈팅 타겟존 (문제 & 발사 타겟) -->
@@ -202,8 +202,8 @@ import { storage export class BossGame {
             <!-- 닥터 히어로 AED 파동 이동 필드 -->
             <div class="hero-shooting-field">
               <div id="arcade-hero-ship" class="hero-ship-box" style="left: ${this.heroPosPercent}%;">
-                <img src="./assets/3d_doctor_hero.jpg" alt="3D 흰가운 닥터 히어로" class="hero-ship-img glow-lvl-${Math.min(this.correctCount, 5)}">
-                <div class="hero-ship-label">🩺 닥터 히어로 (Lv.${heroLevel})</div>
+                <img src="./assets/3d_doctor_hero.jpg" alt="3D 응급 히어로" class="hero-ship-img glow-lvl-${Math.min(this.correctCount, 5)}">
+                <div class="hero-ship-label">🩺 응급 히어로 (Lv.${heroLevel})</div>
                 <div class="aed-cannon-glow">⚡ AED 발사대</div>
               </div>
             </div>
