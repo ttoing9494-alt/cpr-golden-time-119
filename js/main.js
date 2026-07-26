@@ -171,33 +171,18 @@ class AppController {
     if (viewId === 'home-view') {
       this.renderHomeProgress();
     } else if (viewId === 'minigame1-view') {
-      const progress = storage.getProgress();
-      if (progress.minigame1Cleared) {
-        const retry = confirm('✅ 미니게임 1은 이미 완료했습니다!\n다시 도전하면 기존 점수는 유지됩니다. 재도전하시겠습니까?');
-        if (!retry) { this.navigateTo('home-view'); return; }
-      }
       const container = document.getElementById('mg1-container');
       this.currentGame = new Minigame1(container, () => {
         this.navigateTo('home-view');
       });
       this.currentGame.init();
     } else if (viewId === 'minigame2-view') {
-      const progress = storage.getProgress();
-      if (progress.minigame2Cleared) {
-        const retry = confirm('✅ 미니게임 2는 이미 완료했습니다!\n다시 도전하면 기존 점수는 유지됩니다. 재도전하시겠습니까?');
-        if (!retry) { this.navigateTo('home-view'); return; }
-      }
       const container = document.getElementById('mg2-container');
       this.currentGame = new Minigame2(container, () => {
         this.navigateTo('home-view');
       });
       this.currentGame.init();
     } else if (viewId === 'minigame3-view') {
-      const progress = storage.getProgress();
-      if (progress.minigame3Cleared) {
-        const retry = confirm('✅ 미니게임 3은 이미 완료했습니다!\n다시 도전하면 기존 점수는 유지됩니다. 재도전하시겠습니까?');
-        if (!retry) { this.navigateTo('home-view'); return; }
-      }
       const container = document.getElementById('mg3-container');
       this.currentGame = new Minigame3(container, () => {
         this.navigateTo('home-view');

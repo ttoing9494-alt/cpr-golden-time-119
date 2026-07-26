@@ -169,9 +169,11 @@ export class Minigame2 {
     audioManager.playGold();
 
     const curProgress = storage.getProgress();
-    curProgress.minigame2Cleared = true;
-    curProgress.gold += 30;
-    storage.saveProgress(curProgress);
+    if (!curProgress.minigame2Cleared) {
+      curProgress.minigame2Cleared = true;
+      curProgress.gold += 30;
+      storage.saveProgress(curProgress);
+    }
 
     achievementsManager.checkAndUnlock('first_rescue');
     if (isPerfect) {

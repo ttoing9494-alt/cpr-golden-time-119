@@ -331,9 +331,11 @@ export class Minigame1 {
         modalOverlay.classList.add('hidden');
         // 골드 및 진행 상황 저장
         const curProgress = storage.getProgress();
-        curProgress.minigame1Cleared = true;
-        curProgress.gold += 30;
-        storage.saveProgress(curProgress);
+        if (!curProgress.minigame1Cleared) {
+          curProgress.minigame1Cleared = true;
+          curProgress.gold += 30;
+          storage.saveProgress(curProgress);
+        }
 
         achievementsManager.checkAndUnlock('first_rescue');
         achievementsManager.checkAndUnlock('cpr_expert');
