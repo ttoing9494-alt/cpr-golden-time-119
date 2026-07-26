@@ -119,6 +119,39 @@ export class Minigame1 {
     const sourcePool = this.container.querySelector('#source-pool');
 
     let draggedCardId = null;
+    let autoScrollRAF = null;
+    let dragClientY = 0;
+
+    // 드래그 중 화면 자동 스크롤 함수
+    const startAutoScroll = () => {
+      const ZONE = 120;      // 화면 가장자리로부터 스크롤 감지 영역 (px)
+      const SPEED = 12;      // 최대 스크롤 속도 (px/frame)
+
+      const step = () => {
+        const vh = window.innerHeight;
+        const y = dragClientY;
+
+        if (y < ZONE) {
+          // 위쪽 영역 → 위로 스크롤
+          const intensity = 1 - y / ZONE;
+          window.scrollBy(0, -Math.ceil(SPEED * intensity));
+        } else if (y > vh - ZONE) {
+          // 아래쪽 영역 → 아래로 스크롤
+          const intensity = 1 - (vh - y) / ZONE;
+          window.scrollBy(0, Math.ceil(SPEED * intensity));
+        }
+        autoScrollRAF = requestAnimationFrame(step);
+      };
+
+      autoScrollRAF = requestAnimationFrame(step);
+    };
+
+    const stopAutoScroll = () => {
+      if (autoScrollRAF) {
+        cancelAnimationFrame(autoScrollRAF);
+        autoScrollRAF = null;
+      }
+    };
 
     // Desktop Drag & Drop
     cards.forEach(card => {
@@ -126,10 +159,17 @@ export class Minigame1 {
         draggedCardId = parseInt(card.getAttribute('data-id'));
         e.dataTransfer.setData('text/plain', draggedCardId);
         card.classList.add('dragging');
+        startAutoScroll();
+      });
+
+      // 드래그 중 마우스 Y 위치 추적
+      card.addEventListener('drag', (e) => {
+        if (e.clientY !== 0) dragClientY = e.clientY;
       });
 
       card.addEventListener('dragend', () => {
         card.classList.remove('dragging');
+        stopAutoScroll();
       });
 
       // Mobile / Click Selection
@@ -227,7 +267,7 @@ export class Minigame1 {
       `;
       slotEl.classList.add('has-card');
     } else {
-      slotEl.innerHTML = `<span class="slot-placeholder">이곳으로 드래그하거나 선택하세요</span>`;
+      slotEl.innerHTML = `<span class="slot-placeholder">이곳으로 드래그해주세요</span>`;
       slotEl.classList.remove('has-card');
     }
   }
