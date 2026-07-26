@@ -144,11 +144,12 @@ export class Minigame1 {
   }
 
   bindEvents() {
-    const cards = this.container.querySelectorAll('.cpr-card');
+    const cards = this.container.querySelectorAll('#source-pool .cpr-card');
     const slots = this.container.querySelectorAll('.slot-content');
     const sourcePool = this.container.querySelector('#source-pool');
 
     let draggedCardId = null;
+    let isDragging = false;
     let autoScrollRAF = null;
     let dragClientY = 0;
 
@@ -162,11 +163,9 @@ export class Minigame1 {
         const y = dragClientY;
 
         if (y < ZONE) {
-          // 위쪽 영역 → 위로 스크롤
           const intensity = 1 - y / ZONE;
           window.scrollBy(0, -Math.ceil(SPEED * intensity));
         } else if (y > vh - ZONE) {
-          // 아래쪽 영역 → 아래로 스크롤
           const intensity = 1 - (vh - y) / ZONE;
           window.scrollBy(0, Math.ceil(SPEED * intensity));
         }
@@ -183,16 +182,20 @@ export class Minigame1 {
       }
     };
 
-    // Desktop Drag & Drop
+    // Desktop & Mobile Source Pool Cards
     cards.forEach(card => {
       card.addEventListener('dragstart', (e) => {
+        if (card.classList.contains('used')) {
+          e.preventDefault();
+          return;
+        }
+        isDragging = true;
         draggedCardId = parseInt(card.getAttribute('data-id'));
         e.dataTransfer.setData('text/plain', draggedCardId);
         card.classList.add('dragging');
         startAutoScroll();
       });
 
-      // 드래그 중 마우스 Y 위치 추적
       card.addEventListener('drag', (e) => {
         if (e.clientY !== 0) dragClientY = e.clientY;
       });
@@ -200,10 +203,14 @@ export class Minigame1 {
       card.addEventListener('dragend', () => {
         card.classList.remove('dragging');
         stopAutoScroll();
+        setTimeout(() => {
+          isDragging = false;
+        }, 150);
       });
 
-      // Mobile / Click Selection
-      card.addEventListener('click', () => {
+      // Mobile / Click Selection (드래그 직후 후속 클릭 방지)
+      card.addEventListener('click', (e) => {
+        if (isDragging || card.classList.contains('used')) return;
         const id = parseInt(card.getAttribute('data-id'));
         const emptySlotIdx = this.userOrder.findIndex(item => item === null);
         if (emptySlotIdx !== -1) {
@@ -226,14 +233,16 @@ export class Minigame1 {
         e.preventDefault();
         slot.classList.remove('drag-over');
         const slotIdx = parseInt(slot.getAttribute('data-index'));
-        const id = parseInt(e.dataTransfer.getData('text/plain') || draggedCardId);
-        if (id) {
+        const rawData = e.dataTransfer.getData('text/plain');
+        const id = parseInt(rawData || draggedCardId);
+        if (id && !isNaN(id)) {
           this.placeCardInSlot(id, slotIdx);
         }
       });
 
       // 슬롯에 배치된 카드 클릭 시 원복
-      slot.addEventListener('click', () => {
+      slot.addEventListener('click', (e) => {
+        if (isDragging) return;
         const slotIdx = parseInt(slot.getAttribute('data-index'));
         if (this.userOrder[slotIdx] !== null) {
           this.removeCardFromSlot(slotIdx);
@@ -308,8 +317,10 @@ export class Minigame1 {
       const id = parseInt(card.getAttribute('data-id'));
       if (this.userOrder.includes(id)) {
         card.classList.add('used');
+        card.setAttribute('draggable', 'false');
       } else {
         card.classList.remove('used');
+        card.setAttribute('draggable', 'true');
       }
     });
   }
