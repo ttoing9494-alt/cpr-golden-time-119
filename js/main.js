@@ -323,7 +323,23 @@ class AppController {
   }
 }
 
-// 앱 실행
-document.addEventListener('DOMContentLoaded', () => {
-  window.cprApp = new AppController();
-});
+// 앱 실행 (ES 모듈 호환: 이미 DOM이 로드된 경우 즉시 실행, 로딩 중이면 DOMContentLoaded 이벤트 등록)
+const initApp = () => {
+  if (!window.cprApp) {
+    window.cprApp = new AppController();
+  }
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+// 전역 화면 전환 단축 함수 등록 (인라인 onclick 100% 보장)
+window.navigateTo = (viewId) => {
+  initApp();
+  if (window.cprApp) {
+    window.cprApp.navigateTo(viewId);
+  }
+};
