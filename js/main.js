@@ -204,9 +204,6 @@ class AppController {
   }
 
   navigateTo(viewId) {
-    const gameViews = ['minigame1-view', 'minigame2-view', 'minigame3-view', 'boss-view'];
-
-    // 유저 상태 검증 및 자동 게스트 보장
     if (!authManager.currentUser) {
       authManager.ensureGuestUser();
     }
@@ -214,58 +211,78 @@ class AppController {
     this.currentView = viewId;
 
     // 미니게임 타이머나 캔버스 정리
-    if (this.currentGame && typeof this.currentGame.stopTimer === 'function') {
-      this.currentGame.stopTimer();
-    }
-    if (this.currentGame && typeof this.currentGame.stopLoop === 'function') {
-      this.currentGame.stopLoop();
+    try {
+      if (this.currentGame && typeof this.currentGame.stopTimer === 'function') {
+        this.currentGame.stopTimer();
+      }
+      if (this.currentGame && typeof this.currentGame.stopLoop === 'function') {
+        this.currentGame.stopLoop();
+      }
+    } catch (e) {
+      console.warn("Clean game state warning:", e);
     }
     this.currentGame = null;
 
+    // 화면 전환 (100% 시각적 노출)
     this.showView(viewId);
     this.updateGoldDisplay();
 
     // 뷰별 초기화 렌더링
-    if (viewId === 'home-view') {
-      this.renderHomeProgress();
-    } else if (viewId === 'minigame1-view') {
-      const container = document.getElementById('mg1-container');
-      this.currentGame = new Minigame1(container, () => {
-        this.navigateTo('home-view');
-      });
-      this.currentGame.init();
-    } else if (viewId === 'minigame2-view') {
-      const container = document.getElementById('mg2-container');
-      this.currentGame = new Minigame2(container, () => {
-        this.navigateTo('home-view');
-      });
-      this.currentGame.init();
-    } else if (viewId === 'minigame3-view') {
-      const container = document.getElementById('mg3-container');
-      this.currentGame = new Minigame3(container, () => {
-        this.navigateTo('home-view');
-      });
-      this.currentGame.init();
-    } else if (viewId === 'boss-view') {
-      const container = document.getElementById('boss-container');
-      this.currentGame = new BossGame(container, () => {
-        this.navigateTo('hall-view');
-      }, isAdminMode()); // 관리자 모드 플래그 전달
-      this.currentGame.init();
-    } else if (viewId === 'hall-view') {
-      const container = document.getElementById('hall-container');
-      hallOfFameManager.renderHallOfFamePage(container);
-    } else if (viewId === 'achievements-view') {
-      const container = document.getElementById('achievements-container');
-      achievementsManager.renderAchievementsPage(container);
-    } else if (viewId === 'guide-view') {
-      this.renderGuidePage();
+    try {
+      if (viewId === 'home-view') {
+        this.renderHomeProgress();
+      } else if (viewId === 'minigame1-view') {
+        const container = document.getElementById('mg1-container');
+        if (container) {
+          this.currentGame = new Minigame1(container, () => {
+            this.navigateTo('home-view');
+          });
+          this.currentGame.init();
+        }
+      } else if (viewId === 'minigame2-view') {
+        const container = document.getElementById('mg2-container');
+        if (container) {
+          this.currentGame = new Minigame2(container, () => {
+            this.navigateTo('home-view');
+          });
+          this.currentGame.init();
+        }
+      } else if (viewId === 'minigame3-view') {
+        const container = document.getElementById('mg3-container');
+        if (container) {
+          this.currentGame = new Minigame3(container, () => {
+            this.navigateTo('home-view');
+          });
+          this.currentGame.init();
+        }
+      } else if (viewId === 'boss-view') {
+        const container = document.getElementById('boss-container');
+        if (container) {
+          this.currentGame = new BossGame(container, () => {
+            this.navigateTo('hall-view');
+          }, isAdminMode());
+          this.currentGame.init();
+        }
+      } else if (viewId === 'hall-view') {
+        const container = document.getElementById('hall-container');
+        if (container) hallOfFameManager.renderHallOfFamePage(container);
+      } else if (viewId === 'achievements-view') {
+        const container = document.getElementById('achievements-container');
+        if (container) achievementsManager.renderAchievementsPage(container);
+      } else if (viewId === 'guide-view') {
+        this.renderGuidePage();
+      }
+    } catch (err) {
+      console.error("Game render error:", err);
     }
   }
 
   showView(viewId) {
     document.querySelectorAll('.view-section').forEach(sec => {
       sec.classList.add('hidden');
+    });
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.classList.add('hidden');
     });
     const targetEl = document.getElementById(viewId);
     if (targetEl) {
