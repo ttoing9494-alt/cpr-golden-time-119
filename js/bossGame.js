@@ -57,23 +57,27 @@ export class BossGame {
   render() {
     const quiz = BOSS_QUIZZES[this.currentIndex];
 
-    // ⚔️ 이길 때마다 닥터 히어오는 커지고(1.0x -> 2.0x), 보스 악마는 점점 찌그러지고 줄어듦(1.2x -> 0.6x)
-    const heroScale = (1.0 + (this.correctCount * 0.10)).toFixed(2);
-    const bossScale = Math.max(0.5, (1.2 - (this.correctCount * 0.08))).toFixed(2);
+    // ⚔️ 3D 거리 전진/후퇴 연출 (얼굴이 잘리지 않는 입체 전진 거리감 적용)
+    // 정답을 맞힐수록 닥터 히어로는 전면으로 3D 전진(Forward Advance)하고, 악마 보스는 후방으로 후퇴 및 수척해짐
+    const heroAdvanceZ = (this.correctCount * 8);       // 전면 3D 전진 (px)
+    const heroLiftY = -(this.correctCount * 3);          // 상단 공중 도약 (px)
+    const bossRetreatZ = -(this.correctCount * 8);       // 후방 3D 후퇴 (px)
+    const bossOpacity = Math.max(0.4, (1.0 - (this.correctCount * 0.06))).toFixed(2);
+
     const heroLevel = this.correctCount + 1;
     const bossStatus = this.bossHP > 70 ? '😈 전력 악마' : this.bossHP > 30 ? '💢 타격받은 악마' : '💀 궤멸 직전!';
 
     this.container.innerHTML = `
       <div class="boss-game-wrapper card-panel battleground-hud">
         <div class="boss-header">
-          <div class="boss-title-tag">⚔️ BATTLE ROYALE : 생명을 살리는 사랑의 깍지</div>
+          <div class="boss-title-tag">⚔️ 3D BATTLE ROYALE : 생명을 살리는 사랑의 깍지</div>
           <div class="boss-timer-box">⏱️ BATTLE TIME: <span id="boss-timer-display">${this.elapsedSeconds}초</span></div>
           <div class="boss-stage-count">ROUND ${this.currentIndex + 1} / ${BOSS_QUIZZES.length}</div>
         </div>
 
         <div class="battle-arena battleground-3d-arena">
-          <!-- 1. 어둠의 저승사자 (악마 보스) - 이길수록 축소 및 파괴 -->
-          <div class="boss-avatar-box reaper-boss-box" style="transform: scale(${bossScale}); transition: transform 0.5s ease;">
+          <!-- 1. 어둠의 저승사자 (악마 보스) - 이길수록 후방 후퇴 및 찌그러짐 (얼굴 잘림 없음) -->
+          <div class="boss-avatar-box reaper-boss-box" style="transform: translateZ(${bossRetreatZ}px); opacity: ${bossOpacity}; transition: all 0.5s ease;">
             <div class="avatar-frame GrimReaper-boss 3d-boss-frame">
               <div class="char-3d-wrapper">
                 <img src="./assets/3d_devil_boss.jpg" alt="어둠의 악마 보스" class="char-3d-img boss-3d-render ${this.bossHP < 40 ? 'boss-damaged-effect' : ''}">
@@ -92,14 +96,14 @@ export class BossGame {
             <div class="round-indicator">ROUND ${this.currentIndex + 1}</div>
           </div>
 
-          <!-- 2. 응급구조사 닥터 히어로 - 정답 맞출수록 거대하게 파워업! -->
-          <div class="player-vital-box hero-box" style="transform: scale(${heroScale}); transition: transform 0.5s ease;">
+          <!-- 2. 응급구조사 닥터 히어로 - 정답 맞출수록 3D 전진 도약! (얼굴 100% 선명 보장) -->
+          <div class="player-vital-box hero-box" style="transform: translateZ(${heroAdvanceZ}px) translateY(${heroLiftY}px); transition: all 0.5s ease;">
             <div class="avatar-frame player-hero 3d-hero-frame">
               <div class="char-3d-wrapper hero-power-wrapper">
                 <img src="./assets/3d_doctor_hero.jpg" alt="3D 닥터 히어로" class="char-3d-img hero-3d-render glow-lvl-${Math.min(this.correctCount, 5)}">
                 <div class="hero-golden-aura"></div>
               </div>
-              <div class="player-name">💖 닥터 히어로 <span class="hero-level-badge">Lv.${heroLevel} POWER UP!</span></div>
+              <div class="player-name">💖 닥터 히어로 <span class="hero-level-badge">Lv.${heroLevel} ATTACK!</span></div>
             </div>
 
             <div class="vital-gauges hud-gauges">
