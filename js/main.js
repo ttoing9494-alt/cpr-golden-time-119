@@ -36,6 +36,11 @@ class AppController {
 
     authManager.init((user) => {
       console.log("Auth user state changed:", user);
+      if (!user) {
+        // 미로그인 시 로그인 선택 모달 띄우기
+        const authModal = document.getElementById('auth-modal');
+        if (authModal) authModal.classList.remove('hidden');
+      }
     });
 
     // 2. DOM 요소 바인딩
@@ -153,6 +158,17 @@ class AppController {
   }
 
   navigateTo(viewId) {
+    const gameViews = ['minigame1-view', 'minigame2-view', 'minigame3-view', 'boss-view'];
+
+    // 🔒 로그인(Google/익명) 체크: 게임 진입 시 로그인하지 않은 경우 차단
+    if (gameViews.includes(viewId) && !authManager.currentUser) {
+      audioManager.playWrong();
+      alert('🔒 게임을 시작하려면 먼저 로그인(Google 또는 게스트 익명)을 해주세요!');
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) authModal.classList.remove('hidden');
+      return;
+    }
+
     this.currentView = viewId;
 
     // 미니게임 타이머나 캔버스 정리
