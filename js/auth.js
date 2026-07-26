@@ -52,20 +52,32 @@ export const authManager = {
 
   // 2. 익명 게스트 로그인
   async loginAnonymously() {
-    if (!auth) {
-      alert("오프라인 모드로 플레이합니다.");
-      return;
+    audioManager.playBeat(true);
+    if (auth) {
+      try {
+        const result = await signInAnonymously(auth);
+        audioManager.playGold();
+        alert("👤 익명 게스트로 로그인되었습니다. 즐거운 게임 되세요!");
+        return result.user;
+      } catch (error) {
+        console.warn("Firebase Anonymous Auth unavailable, using local guest fallback:", error);
+      }
     }
-    try {
-      audioManager.playBeat(true);
-      const result = await signInAnonymously(auth);
-      audioManager.playGold();
-      alert("👤 익명 게스트로 로그인되었습니다. 명예의 전당 등록이 가능합니다!");
-      return result.user;
-    } catch (error) {
-      console.error("Anonymous Login Error:", error);
-      alert(`익명 로그인 오류: ${error.message}`);
-    }
+
+    // Firebase 연동 불가능 시 로컬 게스트 세션 생성 (절대 오류나지 않음)
+    this.currentUser = {
+      uid: 'guest-' + Math.random().toString(36).substring(2, 9),
+      displayName: '게스트 구조사',
+      email: '',
+      photoURL: '',
+      isAnonymous: true
+    };
+    audioManager.playGold();
+    this.updateAuthUI();
+    alert("👤 게스트 익명으로 로그인되었습니다!");
+    const authModal = document.getElementById('auth-modal');
+    if (authModal) authModal.classList.add('hidden');
+    return this.currentUser;
   },
 
   // 3. 로그아웃

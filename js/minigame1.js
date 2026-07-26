@@ -41,11 +41,41 @@ export class Minigame1 {
 
       if (this.timer <= 0) {
         clearInterval(this.timerInterval);
-        audioManager.playWrong();
-        alert('⏰ 제한시간이 지났습니다! 다시 도전해보세요.');
-        this.init();
+        this.handleTimeOut();
       }
     }, 1000);
+  }
+
+  handleTimeOut() {
+    audioManager.playWrong();
+    const modalOverlay = this.container.querySelector('#mg1-result-modal');
+    const modalTitle = this.container.querySelector('#mg1-modal-title');
+    const modalBody = this.container.querySelector('#mg1-modal-body');
+    const modalCloseGroup = this.container.querySelector('#mg1-result-modal .btn-group');
+
+    modalTitle.innerHTML = `⏰ 제한시간 초과!`;
+    modalTitle.className = 'modal-title error-text';
+    modalBody.innerHTML = `
+      <p class="result-highlight">제한시간 내에 CPR 7단계 순서를 배치하지 못했습니다.</p>
+      <p class="section-desc">차근차근 다시 도전하여 7단계 올바른 순서를 완성해 보세요!</p>
+    `;
+
+    modalCloseGroup.innerHTML = `
+      <button id="mg1-retry-btn" class="btn btn-primary">🔄 다시 도전하기</button>
+      <button id="mg1-home-btn" class="btn btn-secondary">🏠 메인 화면으로</button>
+    `;
+
+    this.container.querySelector('#mg1-retry-btn').onclick = () => {
+      modalOverlay.classList.add('hidden');
+      this.init();
+    };
+
+    this.container.querySelector('#mg1-home-btn').onclick = () => {
+      modalOverlay.classList.add('hidden');
+      if (this.onComplete) this.onComplete();
+    };
+
+    modalOverlay.classList.remove('hidden');
   }
 
   stopTimer() {

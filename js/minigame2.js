@@ -39,11 +39,41 @@ export class Minigame2 {
 
       if (this.timer <= 0) {
         clearInterval(this.timerInterval);
-        audioManager.playWrong();
-        alert('⏰ 제한시간이 지났습니다! 다시 도전해보세요.');
-        this.init();
+        this.handleTimeOut();
       }
     }, 1000);
+  }
+
+  handleTimeOut() {
+    audioManager.playWrong();
+    const modalOverlay = this.container.querySelector('#mg2-feedback-modal');
+    const modalTitle = this.container.querySelector('#mg2-modal-title');
+    const modalBody = this.container.querySelector('#mg2-modal-body');
+    const modalCloseGroup = this.container.querySelector('#mg2-feedback-modal .btn-group');
+
+    modalTitle.innerHTML = `⏰ 제한시간 초과!`;
+    modalTitle.className = 'modal-title error-text';
+    modalBody.innerHTML = `
+      <p class="result-highlight">제한시간 내에 응급상황 판단 문제를 모두 완료하지 못했습니다.</p>
+      <p class="section-desc">다시 한번 도전하여 올바른 판단을 내리는 훈련을 해보세요!</p>
+    `;
+
+    modalCloseGroup.innerHTML = `
+      <button id="mg2-retry-btn" class="btn btn-primary">🔄 다시 도전하기</button>
+      <button id="mg2-home-btn" class="btn btn-secondary">🏠 메인 화면으로</button>
+    `;
+
+    this.container.querySelector('#mg2-retry-btn').onclick = () => {
+      modalOverlay.classList.add('hidden');
+      this.init();
+    };
+
+    this.container.querySelector('#mg2-home-btn').onclick = () => {
+      modalOverlay.classList.add('hidden');
+      if (this.onComplete) this.onComplete();
+    };
+
+    modalOverlay.classList.remove('hidden');
   }
 
   stopTimer() {

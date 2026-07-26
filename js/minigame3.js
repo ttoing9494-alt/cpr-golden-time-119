@@ -267,6 +267,31 @@ export class Minigame3 {
       accuracy = Math.round(((this.perfectHits + (this.goodHits * 0.5)) / totalValid) * 100);
     }
 
+    if (totalValid === 0 || accuracy < 40) {
+      audioManager.playWrong();
+      this.container.innerHTML = `
+        <div class="minigame-wrapper card-panel align-center">
+          <div class="game-badge">미니게임 3 미완료</div>
+          <h2 class="game-title error-text">⏰ 훈련 미완료!</h2>
+          <p class="result-highlight">제한시간 동안 분당 100~120회 리듬 가슴압박을 채우지 못했습니다.</p>
+          <p class="section-desc">스페이스바 또는 화면을 100~120BPM 속도로 가볍게 두드려 재도전해보세요!</p>
+          
+          <div class="btn-group align-center" style="margin-top: 24px;">
+            <button id="mg3-retry-btn" class="btn btn-primary">🔄 다시 도전하기</button>
+            <button id="mg3-home-btn" class="btn btn-secondary">🏠 메인 화면으로</button>
+          </div>
+        </div>
+      `;
+
+      this.container.querySelector('#mg3-retry-btn').addEventListener('click', () => {
+        this.init();
+      });
+      this.container.querySelector('#mg3-home-btn').addEventListener('click', () => {
+        if (this.onComplete) this.onComplete();
+      });
+      return;
+    }
+
     audioManager.playVictory();
     audioManager.playGold();
 
