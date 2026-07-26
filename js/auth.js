@@ -10,7 +10,11 @@ export const authManager = {
   currentUser: null,
 
   init(onUserChangeCallback) {
-    if (!auth) return;
+    if (!auth) {
+      this.ensureGuestUser();
+      if (onUserChangeCallback) onUserChangeCallback(this.currentUser);
+      return;
+    }
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -22,12 +26,26 @@ export const authManager = {
           isAnonymous: user.isAnonymous
         };
       } else {
-        this.currentUser = null;
+        // 미로그인 시 오프라인 게스트 유저 자동 할당 (게임 즉시 시작 보장)
+        this.ensureGuestUser();
       }
 
       this.updateAuthUI();
       if (onUserChangeCallback) onUserChangeCallback(this.currentUser);
     });
+  },
+
+  ensureGuestUser() {
+    if (!this.currentUser) {
+      this.currentUser = {
+        uid: 'guest-' + Math.random().toString(36).substring(2, 9),
+        displayName: '게스트 구조사',
+        email: '',
+        photoURL: '',
+        isAnonymous: true
+      };
+      this.updateAuthUI();
+    }
   },
 
   // 1. Google 로그인

@@ -157,23 +157,24 @@ class AppController {
     }
 
     if (bossBtn) {
-      const unlocked = isAdminMode()
-        || progress.gold >= 100
-        || (progress.minigame1Cleared && progress.minigame2Cleared && progress.minigame3Cleared);
+      // 🔒 보스전 해금 조건: 미니게임 1, 2, 3이 모두 완료되었거나 관리자 모드인 경우!
+      const allCleared = progress.minigame1Cleared && progress.minigame2Cleared && progress.minigame3Cleared;
+      const unlocked = isAdminMode() || allCleared;
+
+      const clearedCount = (progress.minigame1Cleared ? 1 : 0) + (progress.minigame2Cleared ? 1 : 0) + (progress.minigame3Cleared ? 1 : 0);
 
       // 기존 리스너 제거 후 재등록 방지용 플래그
       if (!bossBtn._listenerBound) {
         bossBtn._listenerBound = true;
-        bossBtn.addEventListener('click', () => {
+        bossBtn.addEventListener('click', (e) => {
+          e.preventDefault();
           const prog = storage.getProgress();
-          const ok = isAdminMode()
-            || prog.gold >= 100
-            || (prog.minigame1Cleared && prog.minigame2Cleared && prog.minigame3Cleared);
-          if (ok) {
+          const isAllCleared = prog.minigame1Cleared && prog.minigame2Cleared && prog.minigame3Cleared;
+          if (isAdminMode() || isAllCleared) {
             audioManager.playBeat(true);
             this.navigateTo('boss-view');
           } else {
-            alert('🔒 100 Gold를 수집하거나 3가지 미니게임을 모두 완료해야 보스전이 해금됩니다!');
+            alert('🔒 3가지 미니게임을 모두 완료해야 보스전이 해금됩니다!');
           }
         });
       }
@@ -188,10 +189,10 @@ class AppController {
           : `⚔️ 보스전 : 생명을 살리는 사랑의 깍지 (입장 가능)`;
       } else {
         bossBtn.setAttribute('disabled', 'true');
-        bossBtn.classList.add('locked-btn');
+        bossBtn.classList.add('locked-btn'); // 미완료 시 회색 비활성화 버튼
         bossBtn.style.cursor = 'not-allowed';
         bossBtn.style.pointerEvents = 'none';
-        bossBtn.innerHTML = `🔒 보스전 (100 Gold 필요 - 현재 ${progress.gold} Gold)`;
+        bossBtn.innerHTML = `🔒 보스전 (미니게임 3개 완료 필요 - 현재 ${clearedCount}/3 완료)`;
       }
     }
   }
@@ -199,13 +200,9 @@ class AppController {
   navigateTo(viewId) {
     const gameViews = ['minigame1-view', 'minigame2-view', 'minigame3-view', 'boss-view'];
 
-    // 🔒 로그인(Google/익명) 체크: 게임 진입 시 미로그인 차단 (단, 관리자 모드인 경우 우회)
-    if (gameViews.includes(viewId) && !authManager.currentUser && !isAdminMode()) {
-      audioManager.playWrong();
-      alert('🔒 게임을 시작하려면 먼저 로그인(Google 또는 게스트 익명)을 해주세요!');
-      const authModal = document.getElementById('auth-modal');
-      if (authModal) authModal.classList.remove('hidden');
-      return;
+    // 유저 상태 검증 및 자동 게스트 보장
+    if (!authManager.currentUser) {
+      authManager.ensureGuestUser();
     }
 
     this.currentView = viewId;
