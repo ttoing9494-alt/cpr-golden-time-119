@@ -195,40 +195,67 @@ export class Minigame2 {
     this.stopTimer();
 
     const isPerfect = this.score === JUDGMENT_QUIZZES.length;
-    audioManager.playVictory();
-    audioManager.playGold();
+    const isPassed = this.score >= 3; // 5문제 중 3문제 이상 맞혀야 통과
 
-    const curProgress = storage.getProgress();
-    if (!curProgress.minigame2Cleared) {
-      curProgress.minigame2Cleared = true;
-      curProgress.gold += 30;
-      storage.saveProgress(curProgress);
-    }
+    if (isPassed) {
+      audioManager.playVictory();
+      audioManager.playGold();
 
-    achievementsManager.checkAndUnlock('first_rescue');
-    if (isPerfect) {
-      achievementsManager.checkAndUnlock('perfect_judge');
-    }
+      const curProgress = storage.getProgress();
+      if (!curProgress.minigame2Cleared) {
+        curProgress.minigame2Cleared = true;
+        curProgress.gold += 30;
+        storage.saveProgress(curProgress);
+      }
 
-    this.container.innerHTML = `
-      <div class="minigame-wrapper card-panel align-center">
-        <div class="game-badge">미니게임 2 완료</div>
-        <h2 class="game-title">🎉 판단 테스트 완료!</h2>
-        <p class="result-highlight">총 ${JUDGMENT_QUIZZES.length}문제 중 <strong>${this.score}문제</strong>를 맞췄습니다!</p>
-        
-        <div class="gold-reward-animation">
-          <span class="gold-icon">💰</span>
-          <span class="gold-amount">+30 Gold 획득!</span>
+      achievementsManager.checkAndUnlock('first_rescue');
+      if (isPerfect) {
+        achievementsManager.checkAndUnlock('perfect_judge');
+      }
+
+      this.container.innerHTML = `
+        <div class="minigame-wrapper card-panel align-center">
+          <div class="game-badge">미니게임 2 완료</div>
+          <h2 class="game-title">🎉 판단 테스트 통과!</h2>
+          <p class="result-highlight">총 ${JUDGMENT_QUIZZES.length}문제 중 <strong>${this.score}문제</strong>를 맞췄습니다!</p>
+          
+          <div class="gold-reward-animation">
+            <span class="gold-icon">💰</span>
+            <span class="gold-amount">+30 Gold 획득!</span>
+          </div>
+
+          <p class="section-desc">올바른 응급 상황 판단력이 더욱 키워졌습니다!</p>
+          
+          <button id="mg2-finish-btn" class="btn btn-primary">🏠 메인 화면으로 돌아가기</button>
         </div>
+      `;
 
-        <p class="section-desc">올바른 응급 상황 판단력이 더욱 키워졌습니다!</p>
-        
-        <button id="mg2-finish-btn" class="btn btn-primary">다음 단계로 이동</button>
-      </div>
-    `;
+      this.container.querySelector('#mg2-finish-btn').addEventListener('click', () => {
+        if (this.onComplete) this.onComplete();
+      });
+    } else {
+      audioManager.playWrong();
+      this.container.innerHTML = `
+        <div class="minigame-wrapper card-panel align-center">
+          <div class="game-badge">미니게임 2 미완료</div>
+          <h2 class="game-title error-text">❌ 훈련 미달 (3문제 이상 필요)</h2>
+          <p class="result-highlight">총 ${JUDGMENT_QUIZZES.length}문제 중 <strong>${this.score}문제</strong>를 맞췄습니다. (3문제 이상 통과 필요)</p>
+          
+          <p class="section-desc">올바른 응급 판단 해설을 기억하고 다시 한번 도전해 보세요!</p>
+          
+          <div class="btn-group align-center" style="margin-top: 24px;">
+            <button id="mg2-retry-btn" class="btn btn-primary">🔄 다시 도전하기</button>
+            <button id="mg2-home-btn" class="btn btn-secondary">🏠 메인 화면으로</button>
+          </div>
+        </div>
+      `;
 
-    this.container.querySelector('#mg2-finish-btn').addEventListener('click', () => {
-      if (this.onComplete) this.onComplete();
-    });
+      this.container.querySelector('#mg2-retry-btn').addEventListener('click', () => {
+        this.init();
+      });
+      this.container.querySelector('#mg2-home-btn').addEventListener('click', () => {
+        if (this.onComplete) this.onComplete();
+      });
+    }
   }
 }

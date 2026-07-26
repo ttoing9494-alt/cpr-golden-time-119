@@ -123,6 +123,9 @@ class AppController {
     const headerResetBtn = document.getElementById('header-reset-progress-btn');
     if (headerResetBtn) headerResetBtn.addEventListener('click', handleReset);
 
+    const heroResetBtn = document.getElementById('hero-reset-progress-btn');
+    if (heroResetBtn) heroResetBtn.addEventListener('click', handleReset);
+
     // 모달 닫기 공통
     document.querySelectorAll('.modal-close-btn').forEach(btn => {
       btn.addEventListener('click', () => {

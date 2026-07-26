@@ -267,12 +267,12 @@ export class Minigame3 {
       accuracy = Math.round(((this.perfectHits + (this.goodHits * 0.5)) / totalValid) * 100);
     }
 
-    if (totalValid === 0 || accuracy < 40) {
+    if (totalValid === 0 || accuracy < 60) {
       audioManager.playWrong();
       this.container.innerHTML = `
         <div class="minigame-wrapper card-panel align-center">
           <div class="game-badge">미니게임 3 미완료</div>
-          <h2 class="game-title error-text">⏰ 훈련 미완료!</h2>
+          <h2 class="game-title error-text">❌ 훈련 미달 (60% 이상 필요)</h2>
           <p class="result-highlight">제한시간 동안 분당 100~120회 리듬 가슴압박을 채우지 못했습니다.</p>
           <p class="section-desc">스페이스바 또는 화면을 100~120BPM 속도로 가볍게 두드려 재도전해보세요!</p>
           
