@@ -43,13 +43,9 @@ class AppController {
           isAnonymous: true
         };
         authManager.updateAuthUI();
-        const authModal = document.getElementById('auth-modal');
-        if (authModal) authModal.classList.add('hidden');
-      } else if (!user) {
-        // 미로그인 시 로그인 선택 모달 띄우기
-        const authModal = document.getElementById('auth-modal');
-        if (authModal) authModal.classList.remove('hidden');
       }
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) authModal.classList.add('hidden');
     });
 
     // 2. DOM 요소 바인딩
