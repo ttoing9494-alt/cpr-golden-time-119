@@ -1,16 +1,23 @@
 {
-  "version": 2,
-  "name": "cpr-golden-time-119",
-  "builds": [
+  "cleanUrls": true,
+  "headers": [
     {
-      "src": "index.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
+      "source": "/styles/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css"
+        }
+      ]
+    },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/js/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/javascript"
+        }
+      ]
     }
   ]
 }
