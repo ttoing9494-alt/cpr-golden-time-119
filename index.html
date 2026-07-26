@@ -45,21 +45,36 @@
     <!-- 1. 메인 홈 화면 (home-view) -->
     <section id="home-view" class="view-section">
 
-      <!-- ★ 히어로 배너: 풀스크린 남색 배경 + 흰색 텍스트 + 빨간 포인트 -->
-      <div class="hero-section">
-        <div class="hero-top-strip">🚨 심폐소생술(CPR) 응급구조 교육 시뮬레이션</div>
+      <!-- ★ 히어로 배너: 3D 게임 스타일 대결 씬 (구조대원 VS 저승사자) -->
+      <div class="hero-section hero-3d-theme">
+        <div class="hero-top-strip">🚨 3D 심폐소생술(CPR) 응급구조 모험 시뮬레이션</div>
 
         <div class="hero-main-content">
+          <!-- 왼쪽: 타이틀 및 캐릭터 배틀 쇼케이스 -->
           <div class="hero-left">
-            <div class="hero-heart-icon">🫀</div>
+            <div class="hero-badge-pill">🎮 5학년 심폐소생술 교육 웹게임</div>
             <h2 class="hero-big-title">
               구조<span class="red-text">골든타임</span><br>
               <span class="hero-sub-line">119</span>
             </h2>
             <p class="hero-tagline">
-              3가지 미니게임을 완료하고 100 Gold를 모아<br>
-              <strong class="red-text">저승사자</strong>에 맞서는 보스전에 도전하세요!
+              응급구조사 대원이 되어 3가지 훈련을 완료하고,<br>
+              영혼을 노리는 <strong class="red-text">저승사자</strong>에 맞서 환자의 생명을 구하세요!
             </p>
+
+            <!-- 3D 캐릭터 듀오 쇼케이스 -->
+            <div class="character-vs-banner">
+              <div class="char-card doctor-card">
+                <img src="./assets/hero_doctor.jpg" alt="구조대원 닥터" class="char-img float-anim">
+                <div class="char-label">💖 닥터 구조대원</div>
+              </div>
+              <div class="vs-badge-3d">VS</div>
+              <div class="char-card reaper-card">
+                <img src="./assets/boss_reaper.jpg" alt="어둠의 저승사자" class="char-img float-anim-reverse">
+                <div class="char-label">⚡ 어둠의 저승사자</div>
+              </div>
+            </div>
+
             <div class="hero-cta-row">
               <div class="menu-card hero-menu-card" data-target-view="guide-view">
                 <span class="menu-icon">📖</span>
@@ -76,6 +91,7 @@
             </div>
           </div>
 
+          <!-- 오른쪽: 바이탈 모니터 및 CPR 7단계 요약 -->
           <div class="hero-right">
             <div class="hero-ecg-card">
               <div class="ecg-label">VITAL MONITOR</div>
@@ -115,6 +131,7 @@
         <!-- 미니게임 1 -->
         <div id="mg1-status-card" class="game-select-card card-panel">
           <div class="card-badge">미완료 (+30 Gold)</div>
+          <div class="game-card-icon-3d">🧩</div>
           <h4 class="card-title">미니게임 1: CPR 순서 맞추기</h4>
           <p class="card-desc">주변 안전 확인부터 구조대 도착까지 7단계 CPR 올바른 순서를 드래그하여 완성하세요!</p>
           <button class="btn btn-primary" data-target-view="minigame1-view">게임 시작 ➡️</button>
@@ -123,6 +140,7 @@
         <!-- 미니게임 2 -->
         <div id="mg2-status-card" class="game-select-card card-panel">
           <div class="card-badge">미완료 (+30 Gold)</div>
+          <div class="game-card-icon-3d">🚨</div>
           <h4 class="card-title">미니게임 2: 응급상황 판단 게임</h4>
           <p class="card-desc">운동장, 체육관, 공원 등 실제 응급상황 카드에서 해서는 안 될 행동과 올바른 판단을 고르세요!</p>
           <button class="btn btn-primary" data-target-view="minigame2-view">게임 시작 ➡️</button>
@@ -131,6 +149,7 @@
         <!-- 미니게임 3 -->
         <div id="mg3-status-card" class="game-select-card card-panel">
           <div class="card-badge">미완료 (+40 Gold)</div>
+          <div class="game-card-icon-3d">💓</div>
           <h4 class="card-title">미니게임 3: CPR 리듬 게임</h4>
           <p class="card-desc">분당 100~120회의 골든 리듬! 스페이스바와 터치로 적정 가슴압박 템포 감각을 익히세요!</p>
           <button class="btn btn-primary" data-target-view="minigame3-view">게임 시작 ➡️</button>
@@ -139,12 +158,17 @@
       </div>
 
       <!-- 최종 평가 (보스전) 해금 영역 -->
-      <div class="boss-entrance-box card-panel align-center">
-        <h3 class="section-title" style="color: var(--color-red-primary)">⚔️ 최종 평가 : 생명을 살리는 사랑의 깍지</h3>
-        <p class="section-desc">100 Gold를 수집하면 어둠의 저승사자에 맞서는 최종 10문제 시뮬레이션 보스전이 해금됩니다!</p>
-        <button id="start-boss-btn" class="btn btn-primary btn-large locked-btn" data-target-view="boss-view" disabled>
-          🔒 최종 평가 (100 Gold 필요)
-        </button>
+      <div class="boss-entrance-box card-panel align-center boss-3d-card">
+        <div class="boss-banner-content">
+          <img src="./assets/boss_reaper.jpg" alt="저승사자 보스" class="boss-thumb-3d">
+          <div class="boss-text-area">
+            <h3 class="section-title" style="color: var(--color-red-primary)">⚔️ 최종 평가 : 생명을 살리는 사랑의 깍지</h3>
+            <p class="section-desc">100 Gold를 수집하면 어둠의 저승사자에 맞서는 최종 10문제 시뮬레이션 보스전이 해금됩니다!</p>
+            <button id="start-boss-btn" class="btn btn-primary btn-large locked-btn" data-target-view="boss-view" disabled>
+              🔒 최종 평가 (100 Gold 필요)
+            </button>
+          </div>
+        </div>
       </div>
     </section>
 
