@@ -51,7 +51,21 @@ class AppController {
     // 2. DOM 요소 바인딩
     this.bindGlobalEvents();
     this.updateGoldDisplay();
-    this.showView('home-view');
+
+    // 3. 해시 변경 라우팅 100% 보장
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && document.getElementById(hash)) {
+        this.navigateTo(hash, false);
+      }
+    });
+
+    const initHash = window.location.hash.replace('#', '');
+    if (initHash && document.getElementById(initHash)) {
+      this.navigateTo(initHash, false);
+    } else {
+      this.showView('home-view');
+    }
 
     // 첫 인터랙션 시 AudioContext 준비
     document.addEventListener('click', () => {
@@ -355,8 +369,9 @@ if (document.readyState === 'loading') {
 
 // 전역 화면 전환 단축 함수 등록 (인라인 onclick 100% 보장)
 window.navigateTo = (viewId) => {
+  window.location.hash = '#' + viewId;
   initApp();
   if (window.cprApp) {
-    window.cprApp.navigateTo(viewId);
+    window.cprApp.navigateTo(viewId, false);
   }
 };
