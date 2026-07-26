@@ -36,7 +36,16 @@ class AppController {
 
     authManager.init((user) => {
       console.log("Auth user state changed:", user);
-      if (!user) {
+      if (isAdminMode()) {
+        authManager.currentUser = {
+          uid: 'admin-master',
+          displayName: '⚡ 관리자 (ADMIN)',
+          isAnonymous: true
+        };
+        authManager.updateAuthUI();
+        const authModal = document.getElementById('auth-modal');
+        if (authModal) authModal.classList.add('hidden');
+      } else if (!user) {
         // 미로그인 시 로그인 선택 모달 띄우기
         const authModal = document.getElementById('auth-modal');
         if (authModal) authModal.classList.remove('hidden');
@@ -167,8 +176,8 @@ class AppController {
   navigateTo(viewId) {
     const gameViews = ['minigame1-view', 'minigame2-view', 'minigame3-view', 'boss-view'];
 
-    // 🔒 로그인(Google/익명) 체크: 게임 진입 시 로그인하지 않은 경우 차단
-    if (gameViews.includes(viewId) && !authManager.currentUser) {
+    // 🔒 로그인(Google/익명) 체크: 게임 진입 시 미로그인 차단 (단, 관리자 모드인 경우 우회)
+    if (gameViews.includes(viewId) && !authManager.currentUser && !isAdminMode()) {
       audioManager.playWrong();
       alert('🔒 게임을 시작하려면 먼저 로그인(Google 또는 게스트 익명)을 해주세요!');
       const authModal = document.getElementById('auth-modal');
