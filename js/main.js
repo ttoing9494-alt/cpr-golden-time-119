@@ -83,8 +83,9 @@ class AppController {
       });
     }
 
-    // 내비게이션 버튼 이벤트
+    // 내비게이션 버튼 이벤트 (start-boss-btn 제외 - 전용 핸들러로 처리)
     document.querySelectorAll('[data-target-view]').forEach(btn => {
+      if (btn.id === 'start-boss-btn') return; // 보스전 버튼은 전용 핸들러로 처리
       btn.addEventListener('click', (e) => {
         const target = btn.getAttribute('data-target-view');
         audioManager.playBeat(true);
@@ -135,23 +136,7 @@ class AppController {
     const heroResetBtn = document.getElementById('hero-reset-progress-btn');
     if (heroResetBtn) heroResetBtn.addEventListener('click', handleReset);
 
-    // 보스전 바로 입장 전용 클릭 핸들러
-    const bossBtn = document.getElementById('start-boss-btn');
-    if (bossBtn) {
-      bossBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const progress = storage.getProgress();
-        const unlocked = isAdminMode()
-          || progress.gold >= 100
-          || (progress.minigame1Cleared && progress.minigame2Cleared && progress.minigame3Cleared);
-
-        if (unlocked || isAdminMode()) {
-          this.navigateTo('boss-view');
-        } else {
-          alert('🔒 100 Gold를 수집하거나 3가지 미니게임을 모두 완료해야 보스전이 해금됩니다!');
-        }
-      });
-    }
+    // 보스전 전용 클릭 핸들러는 updateGoldDisplay() 이후 bindBossBtn()에서 처리
 
     // 모달 닫기 공통
     document.querySelectorAll('.modal-close-btn').forEach(btn => {
@@ -171,23 +156,41 @@ class AppController {
       goldValEl.textContent = progress.gold;
     }
 
-    // 관리자 모드이면 항상 보스전 해금
     if (bossBtn) {
       const unlocked = isAdminMode()
         || progress.gold >= 100
         || (progress.minigame1Cleared && progress.minigame2Cleared && progress.minigame3Cleared);
 
+      // 기존 리스너 제거 후 재등록 방지용 플래그
+      if (!bossBtn._listenerBound) {
+        bossBtn._listenerBound = true;
+        bossBtn.addEventListener('click', () => {
+          const prog = storage.getProgress();
+          const ok = isAdminMode()
+            || prog.gold >= 100
+            || (prog.minigame1Cleared && prog.minigame2Cleared && prog.minigame3Cleared);
+          if (ok) {
+            audioManager.playBeat(true);
+            this.navigateTo('boss-view');
+          } else {
+            alert('🔒 100 Gold를 수집하거나 3가지 미니게임을 모두 완료해야 보스전이 해금됩니다!');
+          }
+        });
+      }
+
       if (unlocked) {
-        bossBtn.disabled = false;
         bossBtn.removeAttribute('disabled');
         bossBtn.classList.remove('locked-btn');
+        bossBtn.style.cursor = 'pointer';
+        bossBtn.style.pointerEvents = 'auto';
         bossBtn.innerHTML = isAdminMode()
           ? `⚡ [ADMIN] 보스전 바로 입장`
           : `⚔️ 보스전 : 생명을 살리는 사랑의 깍지 (입장 가능)`;
       } else {
-        bossBtn.disabled = true;
         bossBtn.setAttribute('disabled', 'true');
         bossBtn.classList.add('locked-btn');
+        bossBtn.style.cursor = 'not-allowed';
+        bossBtn.style.pointerEvents = 'none';
         bossBtn.innerHTML = `🔒 보스전 (100 Gold 필요 - 현재 ${progress.gold} Gold)`;
       }
     }
