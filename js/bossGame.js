@@ -7,11 +7,7 @@
 
 import { BOSS_QUIZZES } from './cprData.js';
 import { audioManager } from './audio.js';
-import { storage } from './storage.js';
-import { achievementsManager } from './achievements.js';
-import { firestoreManager } from './firestore.js';
-
-export class BossGame {
+import { storage export class BossGame {
   constructor(containerEl, onCompleteCallback, adminMode = false) {
     this.container = containerEl;
     this.onComplete = onCompleteCallback;
@@ -22,6 +18,11 @@ export class BossGame {
     this.currentIndex = 0;
     this.correctCount = 0;
     this.startTime = 0;
+
+    // 아케이드 슈팅 플레이어 상태 (Hero Position: 0 ~ 100%)
+    this.heroPosPercent = 50; 
+    this.selectedTargetIdx = 0;
+    this.keyListener = null;
   }
 
   init() {
@@ -30,10 +31,95 @@ export class BossGame {
     this.patientVital = 30;
     this.currentIndex = 0;
     this.correctCount = 0;
+    this.heroPosPercent = 50;
     this.startTime = Date.now();
     this.elapsedSeconds = 0;
     this.startBossTimer();
+    this.bindKeyboardControls();
     this.render();
+  }
+
+  bindKeyboardControls() {
+    if (this.keyListener) {
+      window.removeEventListener('keydown', this.keyListener);
+    }
+
+    this.keyListener = (e) => {
+      // 보스전 화면이 아닐 때는 키 작동 중단
+      const bossView = document.getElementById('boss-view');
+      if (!bossView || bossView.classList.contains('hidden')) return;
+
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        this.moveHero(-15);
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        this.moveHero(15);
+      } else if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') {
+        e.preventDefault();
+        this.fireAEDShock();
+      }
+    };
+
+    window.addEventListener('keydown', this.keyListener);
+  }
+
+  unbindKeyboardControls() {
+    if (this.keyListener) {
+      window.removeEventListener('keydown', this.keyListener);
+      this.keyListener = null;
+    }
+  }
+
+  moveHero(deltaPercent) {
+    this.heroPosPercent = Math.max(10, Math.min(90, this.heroPosPercent + deltaPercent));
+    const heroEl = this.container.querySelector('#arcade-hero-ship');
+    if (heroEl) {
+      heroEl.style.left = `${this.heroPosPercent}%`;
+    }
+
+    // 위치에 맞춰 가장 가까운 선택지 타겟 자동 조준
+    const quiz = BOSS_QUIZZES[this.currentIndex];
+    if (!quiz) return;
+    const optionCount = quiz.options.length;
+    const stepPercent = 80 / Math.max(1, optionCount - 1);
+    
+    let closestIdx = 0;
+    let minDiff = 999;
+    for (let i = 0; i < optionCount; i++) {
+      const targetPos = optionCount === 1 ? 50 : 10 + i * stepPercent;
+      const diff = Math.abs(this.heroPosPercent - targetPos);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = i;
+      }
+    }
+
+    this.selectedTargetIdx = closestIdx;
+    this.updateTargetHighlight();
+  }
+
+  updateTargetHighlight() {
+    const targets = this.container.querySelectorAll('.action-option-target');
+    targets.forEach((target, idx) => {
+      if (idx === this.selectedTargetIdx) {
+        target.classList.add('aimed-target');
+      } else {
+        target.classList.remove('aimed-target');
+      }
+    });
+  }
+
+  fireAEDShock() {
+    // 발사 애니메이션 연출
+    const heroEl = this.container.querySelector('#arcade-hero-ship');
+    if (heroEl) {
+      heroEl.classList.add('hero-shooting');
+      setTimeout(() => heroEl.classList.remove('hero-shooting'), 300);
+    }
+
+    audioManager.playBeat(true);
+
+    // 조준된 선택지로 AED 전기 충격파 처리
+    this.handleAnswer(this.selectedTargetIdx);
   }
 
   startBossTimer() {
@@ -52,60 +138,91 @@ export class BossGame {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+    this.unbindKeyboardControls();
   }
 
   render() {
     const quiz = BOSS_QUIZZES[this.currentIndex];
-
-    // ⚔️ 3D 거리 전진/후퇴 연출 (얼굴이 잘리지 않는 입체 전진 거리감 적용)
-    // 정답을 맞힐수록 닥터 히어로는 전면으로 3D 전진(Forward Advance)하고, 악마 보스는 후방으로 후퇴 및 수척해짐
-    const heroAdvanceZ = (this.correctCount * 8);       // 전면 3D 전진 (px)
-    const heroLiftY = -(this.correctCount * 3);          // 상단 공중 도약 (px)
-    const bossRetreatZ = -(this.correctCount * 8);       // 후방 3D 후퇴 (px)
-    const bossOpacity = Math.max(0.4, (1.0 - (this.correctCount * 0.06))).toFixed(2);
-
     const heroLevel = this.correctCount + 1;
-    const bossStatus = this.bossHP > 70 ? '😈 전력 악마' : this.bossHP > 30 ? '💢 타격받은 악마' : '💀 궤멸 직전!';
+    const bossStatus = this.bossHP > 70 ? '👻 저승사자의 기운' : this.bossHP > 30 ? '💢 충격받은 저승사자' : '💀 퇴치 직전!';
+
+    // 선택지 개수에 맞춘 타겟 가로 위치 계산
+    const optionCount = quiz.options.length;
+    const stepPercent = optionCount === 1 ? 0 : 80 / (optionCount - 1);
 
     this.container.innerHTML = `
-      <div class="boss-game-wrapper card-panel battleground-hud">
+      <div class="boss-game-wrapper card-panel battleground-hud arcade-boss-wrapper">
+        <!-- 보스전 상단 HUD -->
         <div class="boss-header">
-          <div class="boss-title-tag">⚔️ 3D BATTLE ROYALE : 생명을 살리는 사랑의 깍지</div>
+          <div class="boss-title-tag">⚔️ 3D 아케이드 보스전 : 생명을 살리는 사랑의 깍지</div>
           <div class="boss-timer-box">⏱️ BATTLE TIME: <span id="boss-timer-display">${this.elapsedSeconds}초</span></div>
           <div class="boss-stage-count">ROUND ${this.currentIndex + 1} / ${BOSS_QUIZZES.length}</div>
         </div>
 
-        <div class="battle-arena battleground-3d-arena">
-          <!-- 1. 어둠의 저승사자 (악마 보스) - 이길수록 후방 후퇴 및 찌그러짐 (얼굴 잘림 없음) -->
-          <div class="boss-avatar-box reaper-boss-box" style="transform: translateZ(${bossRetreatZ}px); opacity: ${bossOpacity}; transition: all 0.5s ease;">
+        <!-- 3D 보스전 아케이드 아레나 -->
+        <div class="battle-arena battleground-3d-arena arcade-arena-box">
+          <!-- 1. 친근한 저승사자 (보스) 영역 -->
+          <div class="boss-avatar-box reaper-boss-box">
             <div class="avatar-frame GrimReaper-boss 3d-boss-frame">
               <div class="char-3d-wrapper">
-                <img src="./assets/3d_devil_boss.jpg" alt="어둠의 악마 보스" class="char-3d-img boss-3d-render ${this.bossHP < 40 ? 'boss-damaged-effect' : ''}">
+                <img src="./assets/3d_devil_boss.jpg" alt="친근한 3D 저승사자" class="char-3d-img boss-3d-render ${this.bossHP < 40 ? 'boss-damaged-effect' : ''}">
                 <div class="boss-flame-aura"></div>
               </div>
-              <div class="boss-name">👿 어둠의 저승사자 <span class="boss-status-tag">${bossStatus}</span></div>
+              <div class="boss-name">👻 친근한 저승사자 <span class="boss-status-tag">${bossStatus}</span></div>
             </div>
             <div class="hp-bar-outer hud-hp-outer">
               <div id="boss-hp-fill" class="hp-bar-fill boss-hp" style="width: ${this.bossHP}%"></div>
             </div>
-            <div class="hp-text">악마 보스 위력: <span id="boss-hp-val">${this.bossHP}</span> / 100</div>
+            <div class="hp-text">저승사자 해마 게이지: <span id="boss-hp-val">${this.bossHP}</span> / 100</div>
           </div>
 
-          <div class="vs-divider-3d">
-            <span class="vs-flash">VS</span>
-            <div class="round-indicator">ROUND ${this.currentIndex + 1}</div>
-          </div>
-
-          <!-- 2. 응급구조사 닥터 히어로 - 정답 맞출수록 3D 전진 도약! (얼굴 100% 선명 보장) -->
-          <div class="player-vital-box hero-box" style="transform: translateZ(${heroAdvanceZ}px) translateY(${heroLiftY}px); transition: all 0.5s ease;">
-            <div class="avatar-frame player-hero 3d-hero-frame">
-              <div class="char-3d-wrapper hero-power-wrapper">
-                <img src="./assets/3d_doctor_hero.jpg" alt="3D 닥터 히어로" class="char-3d-img hero-3d-render glow-lvl-${Math.min(this.correctCount, 5)}">
-                <div class="hero-golden-aura"></div>
-              </div>
-              <div class="player-name">💖 닥터 히어로 <span class="hero-level-badge">Lv.${heroLevel} ATTACK!</span></div>
+          <!-- 2. 중앙 아케이드 슈팅 타겟존 (문제 & 발사 타겟) -->
+          <div class="arcade-quiz-zone">
+            <div class="quiz-question-banner">
+              <span class="quiz-type-badge">${quiz.type === 'ox' ? 'OX 퀴즈' : '응급 판단'}</span>
+              <h3 class="arcade-question-text">Q${this.currentIndex + 1}. ${quiz.question}</h3>
             </div>
 
+            <!-- floating quiz options target arena -->
+            <div class="action-targets-arena">
+              ${quiz.options.map((opt, idx) => {
+                const targetLeft = optionCount === 1 ? 50 : 10 + idx * stepPercent;
+                const isAdminCorrect = this.adminMode && idx === quiz.answer;
+                return `
+                  <div class="action-option-target ${idx === this.selectedTargetIdx ? 'aimed-target' : ''} ${isAdminCorrect ? 'admin-target' : ''}" 
+                       style="left: ${targetLeft}%;" data-idx="${idx}">
+                    <div class="target-node-icon">⚡ ${idx + 1}번</div>
+                    <div class="target-node-text">${opt}</div>
+                    ${isAdminCorrect ? '<span class="admin-target-badge">✅ 정답</span>' : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- 닥터 히어로 AED 파동 이동 필드 -->
+            <div class="hero-shooting-field">
+              <div id="arcade-hero-ship" class="hero-ship-box" style="left: ${this.heroPosPercent}%;">
+                <img src="./assets/3d_doctor_hero.jpg" alt="3D 흰가운 닥터 히어로" class="hero-ship-img glow-lvl-${Math.min(this.correctCount, 5)}">
+                <div class="hero-ship-label">🩺 닥터 히어로 (Lv.${heroLevel})</div>
+                <div class="aed-cannon-glow">⚡ AED 발사대</div>
+              </div>
+            </div>
+
+            <!-- 조작 가이드 & 터치 컨트롤 버튼 (모바일/마우스 겸용) -->
+            <div class="arcade-controls-bar">
+              <div class="keyboard-guide">
+                🎮 키보드 조작: <strong>[←] [→] 방향키 이동</strong> &nbsp;|&nbsp; <strong>[Spacebar] AED 전기충격 발사!</strong>
+              </div>
+              <div class="touch-controls-group">
+                <button id="btn-move-left" class="btn btn-secondary btn-small">⬅️ 왼쪽 이동</button>
+                <button id="btn-fire-aed" class="btn btn-primary btn-large fire-btn">⚡ AED 전기충격 발사! [Space]</button>
+                <button id="btn-move-right" class="btn btn-secondary btn-small">오른쪽 이동 ➡️</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 닥터 히어로 스탯 게이지 -->
+          <div class="player-vital-box hero-box">
             <div class="vital-gauges hud-gauges">
               <div class="gauge-row">
                 <span class="gauge-label">구조사 집중력(HP):</span>
@@ -124,30 +241,54 @@ export class BossGame {
           </div>
         </div>
 
-        <!-- 퀴즈 구역 (배틀그라운드 HUD 카키/네온 3D 스타일) -->
-        <div class="boss-quiz-card card-panel hud-quiz-card">
-          <div class="quiz-badge hud-badge">${quiz.type === 'ox' ? 'OX 퀴즈' : '응급 판단 지식'}</div>
-          <h3 class="boss-question-text">${quiz.question}</h3>
-
-          <div class="boss-options-grid">
-            ${quiz.options.map((opt, idx) => `
-              <button class="boss-opt-btn btn-choice ${this.adminMode && idx === quiz.answer ? 'admin-answer' : ''}" data-idx="${idx}">
-                <span class="opt-bullet">${idx + 1}</span>
-                <span class="opt-label">${opt}</span>
-                ${this.adminMode && idx === quiz.answer ? '<span class="admin-badge">✅ 정답</span>' : ''}
-              </button>
-            `).join('')}
-          </div>
-
-          ${this.adminMode ? `
-          <div class="admin-hint-box">
-            🔐 <strong>[ADMIN 모드]</strong> 정답: <strong>${quiz.answer + 1}번</strong> &nbsp;|&nbsp; 해설: ${quiz.explanation}
-          </div>` : ''}
-        </div>
+        ${this.adminMode ? `
+        <div class="admin-hint-box">
+          🔐 <strong>[ADMIN 모드]</strong> 정답: <strong>${quiz.answer + 1}번 타겟</strong> &nbsp;|&nbsp; 해설: ${quiz.explanation}
+        </div>` : ''}
 
         <!-- 피드백 팝업 -->
         <div id="boss-feedback-modal" class="modal-overlay hidden">
           <div class="modal-content card-panel hud-modal">
+            <h3 id="boss-modal-title" class="modal-title"></h3>
+            <div id="boss-modal-body" class="modal-body"></div>
+            <div class="btn-group align-center">
+              <button id="boss-modal-next" class="btn btn-primary btn-large">다음 라운드 진행 ⚔️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.bindEvents();
+    this.updateTargetHighlight();
+  }
+
+  bindEvents() {
+    // 터치/마우스 컨트롤 버튼
+    const leftBtn = this.container.querySelector('#btn-move-left');
+    const rightBtn = this.container.querySelector('#btn-move-right');
+    const fireBtn = this.container.querySelector('#btn-move-fire') || this.container.querySelector('#btn-fire-aed');
+
+    if (leftBtn) leftBtn.addEventListener('click', () => this.moveHero(-15));
+    if (rightBtn) rightBtn.addEventListener('click', () => this.moveHero(15));
+    if (fireBtn) fireBtn.addEventListener('click', () => this.fireAEDShock());
+
+    // 타겟 직접 터치/클릭 조준 발사 지원
+    const targets = this.container.querySelectorAll('.action-option-target');
+    targets.forEach((target) => {
+      target.addEventListener('click', () => {
+        const idx = parseInt(target.getAttribute('data-idx'));
+        this.selectedTargetIdx = idx;
+        const quiz = BOSS_QUIZZES[this.currentIndex];
+        const stepPercent = quiz.options.length === 1 ? 0 : 80 / (quiz.options.length - 1);
+        this.heroPosPercent = 10 + idx * stepPercent;
+        const heroEl = this.container.querySelector('#arcade-hero-ship');
+        if (heroEl) heroEl.style.left = `${this.heroPosPercent}%`;
+        this.updateTargetHighlight();
+        this.fireAEDShock();
+      });
+    });
+  }el hud-modal">
             <h3 id="boss-modal-title" class="modal-title"></h3>
             <div id="boss-modal-body" class="modal-body"></div>
             <div class="btn-group align-center">

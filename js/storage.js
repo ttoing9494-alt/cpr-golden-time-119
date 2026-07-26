@@ -73,6 +73,11 @@ export const storage = {
       gold: 0
     };
     this.saveProgress(defaultProgress);
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACHIEVEMENTS, JSON.stringify([]));
+    } catch (e) {
+      console.error('Failed to reset achievements:', e);
+    }
     return defaultProgress;
   },
 

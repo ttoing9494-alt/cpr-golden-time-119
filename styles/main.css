@@ -34,11 +34,30 @@
 
 body {
   font-family: var(--font-family);
-  background: radial-gradient(circle at center, #0f172a 0%, #090d16 100%);
+  background: radial-gradient(circle at 50% 30%, #152238 0%, #090d16 70%, #03060c 100%);
   color: #f8fafc;
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(239, 68, 68, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: -1;
+  animation: gridPulse 12s linear infinite;
+}
+
+@keyframes gridPulse {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
 }
 
 /* Header: 3D Tactical Glass HUD Header */
