@@ -12,12 +12,13 @@ import { achievementsManager } from './achievements.js';
 import { firestoreManager } from './firestore.js';
 
 export class BossGame {
-  constructor(containerEl, onCompleteCallback) {
+  constructor(containerEl, onCompleteCallback, adminMode = false) {
     this.container = containerEl;
     this.onComplete = onCompleteCallback;
+    this.adminMode = adminMode; // 관리자 모드 플래그
     this.bossHP = 100;
     this.playerHP = 100;
-    this.patientVital = 30; // 30%에서 시작하여 100%로 회복
+    this.patientVital = 30;
     this.currentIndex = 0;
     this.correctCount = 0;
     this.startTime = 0;
@@ -120,12 +121,18 @@ export class BossGame {
 
           <div class="boss-options-grid">
             ${quiz.options.map((opt, idx) => `
-              <button class="boss-opt-btn btn-choice" data-idx="${idx}">
+              <button class="boss-opt-btn btn-choice ${this.adminMode && idx === quiz.answer ? 'admin-answer' : ''}" data-idx="${idx}">
                 <span class="opt-bullet">${idx + 1}</span>
                 <span class="opt-label">${opt}</span>
+                ${this.adminMode && idx === quiz.answer ? '<span class="admin-badge">✅ 정답</span>' : ''}
               </button>
             `).join('')}
           </div>
+
+          ${this.adminMode ? `
+          <div class="admin-hint-box">
+            🔐 <strong>[ADMIN 모드]</strong> 정답: <strong>${quiz.answer + 1}번</strong> &nbsp;|&nbsp; 해설: ${quiz.explanation}
+          </div>` : ''}
         </div>
 
         <!-- 피드백 팝업 -->

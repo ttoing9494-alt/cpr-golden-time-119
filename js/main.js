@@ -14,6 +14,13 @@ import { BossGame } from './bossGame.js';
 import { hallOfFameManager } from './hallOfFame.js';
 import { CPR_STEPS } from './cprData.js';
 
+// ✨ 관리자 모드: URL에 ?admin=true 붙이면 미니게임 링 없이 보스전 입장 + 정답 표시
+// 예시: https://cpr-golden-time-119.vercel.app/?admin=true
+const isAdminMode = () => {
+  return new URLSearchParams(window.location.search).get('admin') === 'true'
+    || window.location.hash === '#admin';
+};
+
 class AppController {
   constructor() {
     this.currentView = 'home';
@@ -125,12 +132,18 @@ class AppController {
       goldValEl.textContent = progress.gold;
     }
 
-    // 골드 100이상 또는 미니게임 3개 모두 통과시 보스전 해금
+    // 관리자 모드이면 항상 보스전 해금
     if (bossBtn) {
-      if (progress.gold >= 100 || (progress.minigame1Cleared && progress.minigame2Cleared && progress.minigame3Cleared)) {
+      const unlocked = isAdminMode()
+        || progress.gold >= 100
+        || (progress.minigame1Cleared && progress.minigame2Cleared && progress.minigame3Cleared);
+
+      if (unlocked) {
         bossBtn.disabled = false;
         bossBtn.classList.remove('locked-btn');
-        bossBtn.innerHTML = `⚔️ 최종 평가 : 생명을 살리는 사랑의 깍지 (입장 가능)`;
+        bossBtn.innerHTML = isAdminMode()
+          ? `⚡ [ADMIN] 최종 평가 바로 입장`
+          : `⚔️ 최종 평가 : 생명을 살리는 사랑의 깍지 (입장 가능)`;
       } else {
         bossBtn.disabled = true;
         bossBtn.classList.add('locked-btn');
@@ -158,18 +171,33 @@ class AppController {
     if (viewId === 'home-view') {
       this.renderHomeProgress();
     } else if (viewId === 'minigame1-view') {
+      const progress = storage.getProgress();
+      if (progress.minigame1Cleared) {
+        const retry = confirm('✅ 미니게임 1은 이미 완료했습니다!\n다시 도전하면 기존 점수는 유지됩니다. 재도전하시겠습니까?');
+        if (!retry) { this.navigateTo('home-view'); return; }
+      }
       const container = document.getElementById('mg1-container');
       this.currentGame = new Minigame1(container, () => {
         this.navigateTo('home-view');
       });
       this.currentGame.init();
     } else if (viewId === 'minigame2-view') {
+      const progress = storage.getProgress();
+      if (progress.minigame2Cleared) {
+        const retry = confirm('✅ 미니게임 2는 이미 완료했습니다!\n다시 도전하면 기존 점수는 유지됩니다. 재도전하시겠습니까?');
+        if (!retry) { this.navigateTo('home-view'); return; }
+      }
       const container = document.getElementById('mg2-container');
       this.currentGame = new Minigame2(container, () => {
         this.navigateTo('home-view');
       });
       this.currentGame.init();
     } else if (viewId === 'minigame3-view') {
+      const progress = storage.getProgress();
+      if (progress.minigame3Cleared) {
+        const retry = confirm('✅ 미니게임 3은 이미 완료했습니다!\n다시 도전하면 기존 점수는 유지됩니다. 재도전하시겠습니까?');
+        if (!retry) { this.navigateTo('home-view'); return; }
+      }
       const container = document.getElementById('mg3-container');
       this.currentGame = new Minigame3(container, () => {
         this.navigateTo('home-view');
@@ -179,7 +207,7 @@ class AppController {
       const container = document.getElementById('boss-container');
       this.currentGame = new BossGame(container, () => {
         this.navigateTo('hall-view');
-      });
+      }, isAdminMode()); // 관리자 모드 플래그 전달
       this.currentGame.init();
     } else if (viewId === 'hall-view') {
       const container = document.getElementById('hall-container');
