@@ -106,18 +106,22 @@ class AppController {
       });
     }
 
-    // 게임 진행 초기화 버튼
+    // 게임 진행 초기화 버튼 (설정 모달 및 상단 헤더)
+    const handleReset = () => {
+      if (confirm('게임 진행 상황과 골드를 처음부터 다시 시작하시겠습니까?')) {
+        storage.resetProgress();
+        this.updateGoldDisplay();
+        this.renderHomeProgress();
+        alert('진행 상황이 초기화되었습니다.');
+        this.navigateTo('home-view');
+      }
+    };
+
     const resetProgressBtn = document.getElementById('reset-progress-btn');
-    if (resetProgressBtn) {
-      resetProgressBtn.addEventListener('click', () => {
-        if (confirm('게임 진행 상황과 골드를 처음부터 다시 시작하시겠습니까?')) {
-          storage.resetProgress();
-          this.updateGoldDisplay();
-          alert('진행 상황이 초기화되었습니다.');
-          this.navigateTo('home-view');
-        }
-      });
-    }
+    if (resetProgressBtn) resetProgressBtn.addEventListener('click', handleReset);
+
+    const headerResetBtn = document.getElementById('header-reset-progress-btn');
+    if (headerResetBtn) headerResetBtn.addEventListener('click', handleReset);
 
     // 모달 닫기 공통
     document.querySelectorAll('.modal-close-btn').forEach(btn => {
