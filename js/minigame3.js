@@ -328,7 +328,7 @@ export class Minigame3 {
         </div>
 
         <button id="mg3-finish-btn" class="btn btn-primary btn-large">
-          ⚔️ 최종 평가(사랑의 깍지 보스전) 도전하기
+          ⚔️ 보스전 (사랑의 깍지) 도전하기
         </button>
       </div>
     `;

@@ -135,6 +135,24 @@ class AppController {
     const heroResetBtn = document.getElementById('hero-reset-progress-btn');
     if (heroResetBtn) heroResetBtn.addEventListener('click', handleReset);
 
+    // 보스전 바로 입장 전용 클릭 핸들러
+    const bossBtn = document.getElementById('start-boss-btn');
+    if (bossBtn) {
+      bossBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const progress = storage.getProgress();
+        const unlocked = isAdminMode()
+          || progress.gold >= 100
+          || (progress.minigame1Cleared && progress.minigame2Cleared && progress.minigame3Cleared);
+
+        if (unlocked || isAdminMode()) {
+          this.navigateTo('boss-view');
+        } else {
+          alert('🔒 100 Gold를 수집하거나 3가지 미니게임을 모두 완료해야 보스전이 해금됩니다!');
+        }
+      });
+    }
+
     // 모달 닫기 공통
     document.querySelectorAll('.modal-close-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -161,14 +179,16 @@ class AppController {
 
       if (unlocked) {
         bossBtn.disabled = false;
+        bossBtn.removeAttribute('disabled');
         bossBtn.classList.remove('locked-btn');
         bossBtn.innerHTML = isAdminMode()
-          ? `⚡ [ADMIN] 최종 평가 바로 입장`
-          : `⚔️ 최종 평가 : 생명을 살리는 사랑의 깍지 (입장 가능)`;
+          ? `⚡ [ADMIN] 보스전 바로 입장`
+          : `⚔️ 보스전 : 생명을 살리는 사랑의 깍지 (입장 가능)`;
       } else {
         bossBtn.disabled = true;
+        bossBtn.setAttribute('disabled', 'true');
         bossBtn.classList.add('locked-btn');
-        bossBtn.innerHTML = `🔒 최종 평가 (100 Gold 필요 - 현재 ${progress.gold} Gold)`;
+        bossBtn.innerHTML = `🔒 보스전 (100 Gold 필요 - 현재 ${progress.gold} Gold)`;
       }
     }
   }
