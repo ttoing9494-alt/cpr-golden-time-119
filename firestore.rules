@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 명예의 전당 (hallOfFame) 보안 규칙
+    match /hallOfFame/{document} {
+      // 1. 누구나 순위표를 조회할 수 있습니다 (읽기 허용)
+      allow read: if true;
+      
+      // 2. 새로운 구조 기록 작성 시 필수 항목 검증 (보안 강화)
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.score is number
+                    && request.resource.data.accuracy is number
+                    && request.resource.data.bossTime is number
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 20;
+                    
+      // 3. 기존 기록의 무단 수정 및 삭제 방지
+      allow update, delete: if false;
+    }
+  }
+}
