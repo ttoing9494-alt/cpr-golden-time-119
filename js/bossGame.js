@@ -57,56 +57,62 @@ export class BossGame {
   render() {
     const quiz = BOSS_QUIZZES[this.currentIndex];
 
+    // ⚔️ 이길 때마다 닥터 히어오는 커지고(1.0x -> 2.0x), 보스 악마는 점점 찌그러지고 줄어듦(1.2x -> 0.6x)
+    const heroScale = (1.0 + (this.correctCount * 0.10)).toFixed(2);
+    const bossScale = Math.max(0.5, (1.2 - (this.correctCount * 0.08))).toFixed(2);
+    const heroLevel = this.correctCount + 1;
+    const bossStatus = this.bossHP > 70 ? '😈 전력 악마' : this.bossHP > 30 ? '💢 타격받은 악마' : '💀 궤멸 직전!';
+
     this.container.innerHTML = `
-      <div class="boss-game-wrapper card-panel">
+      <div class="boss-game-wrapper card-panel battleground-hud">
         <div class="boss-header">
-          <div class="boss-title-tag">⚔️ 최종 평가 : 생명을 살리는 사랑의 깍지</div>
-          <div class="boss-timer-box">⏱️ 보스 도전 시간: <span id="boss-timer-display">${this.elapsedSeconds}초</span></div>
-          <div class="boss-stage-count">스테이지 ${this.currentIndex + 1} / ${BOSS_QUIZZES.length}</div>
+          <div class="boss-title-tag">⚔️ BATTLE ROYALE : 생명을 살리는 사랑의 깍지</div>
+          <div class="boss-timer-box">⏱️ BATTLE TIME: <span id="boss-timer-display">${this.elapsedSeconds}초</span></div>
+          <div class="boss-stage-count">ROUND ${this.currentIndex + 1} / ${BOSS_QUIZZES.length}</div>
         </div>
 
-        <div class="battle-arena">
-          <!-- 보스 아바타 및 HP -->
-          <div class="boss-avatar-box">
-            <div class="avatar-frame GrimReaper-boss">
-              <div class="grim-reaper-svg">
-                <svg viewBox="0 0 100 100" class="reaper-icon">
-                  <path d="M50 10 C 25 10, 15 35, 15 65 C 15 85, 30 90, 50 90 C 70 90, 85 85, 85 65 C 85 35, 75 10, 50 10 Z" fill="#0f172a" stroke="#7c3aed" stroke-width="3"/>
-                  <circle cx="38" cy="45" r="5" fill="#ef4444" />
-                  <circle cx="62" cy="45" r="5" fill="#ef4444" />
-                  <path d="M 30 70 Q 50 85 70 70" fill="transparent" stroke="#a855f7" stroke-width="3"/>
-                  <!-- 저승사자 갓 / 대낫 아이콘 -->
-                  <path d="M 10 30 Q 50 5 90 30" fill="none" stroke="#6b21a8" stroke-width="6"/>
-                </svg>
+        <div class="battle-arena battleground-3d-arena">
+          <!-- 1. 어둠의 저승사자 (악마 보스) - 이길수록 축소 및 파괴 -->
+          <div class="boss-avatar-box reaper-boss-box" style="transform: scale(${bossScale}); transition: transform 0.5s ease;">
+            <div class="avatar-frame GrimReaper-boss 3d-boss-frame">
+              <div class="char-3d-wrapper">
+                <img src="./assets/3d_devil_boss.jpg" alt="어둠의 악마 보스" class="char-3d-img boss-3d-render ${this.bossHP < 40 ? 'boss-damaged-effect' : ''}">
+                <div class="boss-flame-aura"></div>
               </div>
-              <div class="boss-name">어둠의 저승사자</div>
+              <div class="boss-name">👿 어둠의 저승사자 <span class="boss-status-tag">${bossStatus}</span></div>
             </div>
-            <div class="hp-bar-outer">
+            <div class="hp-bar-outer hud-hp-outer">
               <div id="boss-hp-fill" class="hp-bar-fill boss-hp" style="width: ${this.bossHP}%"></div>
             </div>
-            <div class="hp-text">저승사자 위력: <span id="boss-hp-val">${this.bossHP}</span> / 100</div>
+            <div class="hp-text">악마 보스 위력: <span id="boss-hp-val">${this.bossHP}</span> / 100</div>
           </div>
 
-          <div class="vs-divider">VS</div>
+          <div class="vs-divider-3d">
+            <span class="vs-flash">VS</span>
+            <div class="round-indicator">ROUND ${this.currentIndex + 1}</div>
+          </div>
 
-          <!-- 플레이어 & 환자 상태 -->
-          <div class="player-vital-box">
-            <div class="avatar-frame player-hero">
-              <div class="hero-icon">💖</div>
-              <div class="player-name">응급구조사 (사랑의 깍지)</div>
+          <!-- 2. 응급구조사 닥터 히어로 - 정답 맞출수록 거대하게 파워업! -->
+          <div class="player-vital-box hero-box" style="transform: scale(${heroScale}); transition: transform 0.5s ease;">
+            <div class="avatar-frame player-hero 3d-hero-frame">
+              <div class="char-3d-wrapper hero-power-wrapper">
+                <img src="./assets/3d_doctor_hero.jpg" alt="3D 닥터 히어로" class="char-3d-img hero-3d-render glow-lvl-${Math.min(this.correctCount, 5)}">
+                <div class="hero-golden-aura"></div>
+              </div>
+              <div class="player-name">💖 닥터 히어로 <span class="hero-level-badge">Lv.${heroLevel} POWER UP!</span></div>
             </div>
 
-            <div class="vital-gauges">
+            <div class="vital-gauges hud-gauges">
               <div class="gauge-row">
                 <span class="gauge-label">구조사 집중력(HP):</span>
-                <div class="hp-bar-outer">
+                <div class="hp-bar-outer hud-hp-outer">
                   <div id="player-hp-fill" class="hp-bar-fill player-hp" style="width: ${this.playerHP}%"></div>
                 </div>
               </div>
 
               <div class="gauge-row">
                 <span class="gauge-label">환자 생명력(Vital):</span>
-                <div class="hp-bar-outer">
+                <div class="hp-bar-outer hud-hp-outer">
                   <div id="patient-vital-fill" class="hp-bar-fill patient-vital" style="width: ${this.patientVital}%"></div>
                 </div>
               </div>
@@ -114,9 +120,9 @@ export class BossGame {
           </div>
         </div>
 
-        <!-- 퀴즈 구역 -->
-        <div class="boss-quiz-card card-panel">
-          <div class="quiz-badge">${quiz.type === 'ox' ? 'OX 퀴즈' : '응급 판단 지식'}</div>
+        <!-- 퀴즈 구역 (배틀그라운드 HUD 카키/네온 3D 스타일) -->
+        <div class="boss-quiz-card card-panel hud-quiz-card">
+          <div class="quiz-badge hud-badge">${quiz.type === 'ox' ? 'OX 퀴즈' : '응급 판단 지식'}</div>
           <h3 class="boss-question-text">${quiz.question}</h3>
 
           <div class="boss-options-grid">
@@ -137,11 +143,11 @@ export class BossGame {
 
         <!-- 피드백 팝업 -->
         <div id="boss-feedback-modal" class="modal-overlay hidden">
-          <div class="modal-content card-panel">
+          <div class="modal-content card-panel hud-modal">
             <h3 id="boss-modal-title" class="modal-title"></h3>
             <div id="boss-modal-body" class="modal-body"></div>
             <div class="btn-group align-center">
-              <button id="boss-modal-next" class="btn btn-primary">다음 문제 진행 ⚔️</button>
+              <button id="boss-modal-next" class="btn btn-primary btn-large">다음 라운드 진행 ⚔️</button>
             </div>
           </div>
         </div>
