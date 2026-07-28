@@ -98,19 +98,31 @@ class AppController {
       });
     }
 
-    // 전역 이벤트 위임: 클릭된 모든 요소 및 조상 중 data-target-view를 추적하여 100% 화면 진입
+    // capture-phase(true) 이벤트 위임: 클릭된 모든 요소 및 조상 중 data-target-view를 최우선 가로채어 100% 화면 진입
     document.addEventListener('click', (e) => {
       const targetBtn = e.target.closest('[data-target-view]');
       if (!targetBtn) return;
-      if (targetBtn.id === 'start-boss-btn') return; // 보스전 버튼은 전용 핸들러로 처리
 
       const viewId = targetBtn.getAttribute('data-target-view');
-      if (viewId) {
-        e.preventDefault();
-        try { audioManager.playBeat(true); } catch(err) {}
-        this.navigateTo(viewId);
+      if (!viewId) return;
+
+      // 보스전 잠금 상태 체크
+      if (targetBtn.id === 'start-boss-btn') {
+        const prog = storage.getProgress();
+        const isAllCleared = prog.minigame1Cleared && prog.minigame2Cleared && prog.minigame3Cleared;
+        if (!isAdminMode() && !isAllCleared) {
+          e.preventDefault();
+          e.stopPropagation();
+          alert('🔒 3가지 미니게임을 모두 완료해야 보스전이 해금됩니다!');
+          return;
+        }
       }
-    });
+
+      e.preventDefault();
+      e.stopPropagation();
+      try { audioManager.playBeat(true); } catch(err) {}
+      this.navigateTo(viewId);
+    }, true);
 
     // 설정 모달 폼 컨트롤
     const sfxToggle = document.getElementById('setting-sfx');
@@ -155,8 +167,6 @@ class AppController {
     const heroResetBtn = document.getElementById('hero-reset-progress-btn');
     if (heroResetBtn) heroResetBtn.addEventListener('click', handleReset);
 
-    // 보스전 전용 클릭 핸들러는 updateGoldDisplay() 이후 bindBossBtn()에서 처리
-
     // 모달 닫기 공통
     document.querySelectorAll('.modal-close-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -176,27 +186,10 @@ class AppController {
     }
 
     if (bossBtn) {
-      // 🔒 보스전 해금 조건: 미니게임 1, 2, 3이 모두 완료되었거나 관리자 모드인 경우!
       const allCleared = progress.minigame1Cleared && progress.minigame2Cleared && progress.minigame3Cleared;
       const unlocked = isAdminMode() || allCleared;
 
       const clearedCount = (progress.minigame1Cleared ? 1 : 0) + (progress.minigame2Cleared ? 1 : 0) + (progress.minigame3Cleared ? 1 : 0);
-
-      // 기존 리스너 제거 후 재등록 방지용 플래그
-      if (!bossBtn._listenerBound) {
-        bossBtn._listenerBound = true;
-        bossBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const prog = storage.getProgress();
-          const isAllCleared = prog.minigame1Cleared && prog.minigame2Cleared && prog.minigame3Cleared;
-          if (isAdminMode() || isAllCleared) {
-            audioManager.playBeat(true);
-            this.navigateTo('boss-view');
-          } else {
-            alert('🔒 3가지 미니게임을 모두 완료해야 보스전이 해금됩니다!');
-          }
-        });
-      }
 
       if (unlocked) {
         bossBtn.removeAttribute('disabled');
@@ -227,9 +220,16 @@ class AppController {
   }
 
   navigateTo(viewId) {
-    if (!authManager.currentUser) {
-      authManager.ensureGuestUser();
-    }
+    // ✨ 무조건 1순위로 시각적 화면 전환 먼저 보장!
+    this.showView(viewId);
+
+    try {
+      if (typeof authManager !== 'undefined' && authManager && typeof authManager.ensureGuestUser === 'function') {
+        if (!authManager.currentUser) {
+          authManager.ensureGuestUser();
+        }
+      }
+    } catch (e) {}
 
     this.currentView = viewId;
 
@@ -246,9 +246,9 @@ class AppController {
     }
     this.currentGame = null;
 
-    // 화면 전환 (100% 시각적 노출)
-    this.showView(viewId);
-    this.updateGoldDisplay();
+    try {
+      this.updateGoldDisplay();
+    } catch (e) {}
 
     // 뷰별 초기화 렌더링
     try {
