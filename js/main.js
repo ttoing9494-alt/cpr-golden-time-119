@@ -43,11 +43,9 @@ class AppController {
           isAnonymous: true
         };
         authManager.updateAuthUI();
-      } else if (!user && !sessionStorage.getItem('auth_prompt_shown')) {
-        // 최초 게임 접속 시 1회 로그인 선택 모달 안내
-        const authModal = document.getElementById('auth-modal');
-        if (authModal) authModal.classList.remove('hidden');
       }
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) authModal.classList.add('hidden');
     });
 
     // 2. DOM 요소 바인딩

@@ -446,6 +446,12 @@ body::before {
   padding: 20px;
 }
 
+.modal-overlay.hidden {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 .modal-content {
   max-width: 550px;
   width: 100%;
