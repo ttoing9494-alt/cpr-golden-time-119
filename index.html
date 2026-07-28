@@ -13,10 +13,10 @@
 
   <!-- 메인 헤더 / 의료 모니터 상단바 -->
   <header class="app-header" role="banner">
-    <a href="#home-view" class="logo-area" style="cursor: pointer; text-decoration: none;" aria-label="구조골든타임 119 홈으로">
+    <div class="logo-area" data-target-view="home-view" style="cursor: pointer;" aria-label="구조골든타임 119 홈으로">
       <span class="logo-icon" aria-hidden="true">🫀</span>
       <h1 class="logo-title">구조골든타임 119</h1>
-    </a>
+    </div>
 
     <div class="top-user-info">
       <!-- Firebase Auth 로그인 / 프로필 영역 -->
@@ -28,9 +28,9 @@
       <button class="btn-icon" id="header-reset-progress-btn" title="게임 진행 상황 초기화 (처음부터 다시 시도)" aria-label="진행상황 초기화">
         🔄
       </button>
-      <a href="#guide-view" class="btn-icon" title="게임 방법 및 CPR 가이드" aria-label="게임 방법 가이드" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+      <button class="btn-icon" data-target-view="guide-view" title="게임 방법 및 CPR 가이드" aria-label="게임 방법 가이드">
         📖
-      </a>
+      </button>
 
       <!-- 설정 버튼 -->
       <button class="btn-icon" id="open-settings-btn" onclick="document.getElementById('settings-modal').classList.remove('hidden')" title="설정" aria-label="게임 설정">
@@ -83,18 +83,18 @@
                 <span class="menu-icon">🔄</span>
                 <span class="menu-name">기록 초기화</span>
               </div>
-              <a href="#guide-view" class="menu-card hero-menu-card" style="cursor: pointer; text-decoration: none;">
+              <div class="menu-card hero-menu-card" data-target-view="guide-view" style="cursor: pointer;">
                 <span class="menu-icon">📖</span>
                 <span class="menu-name">게임 방법</span>
-              </a>
-              <a href="#hall-view" class="menu-card hero-menu-card" style="cursor: pointer; text-decoration: none;">
+              </div>
+              <div class="menu-card hero-menu-card" data-target-view="hall-view" style="cursor: pointer;">
                 <span class="menu-icon">🏆</span>
                 <span class="menu-name">명예의 전당</span>
-              </a>
-              <a href="#achievements-view" class="menu-card hero-menu-card" style="cursor: pointer; text-decoration: none;">
+              </div>
+              <div class="menu-card hero-menu-card" data-target-view="achievements-view" style="cursor: pointer;">
                 <span class="menu-icon">🏅</span>
                 <span class="menu-name">업적 배지</span>
-              </a>
+              </div>
             </div>
           </div>
 
@@ -136,30 +136,30 @@
       <div class="game-select-grid">
         
         <!-- 미니게임 1 -->
-        <div id="mg1-status-card" class="game-select-card card-panel" onclick="window.location.hash='#minigame1-view'" style="cursor: pointer;">
+        <div id="mg1-status-card" class="game-select-card card-panel" data-target-view="minigame1-view" style="cursor: pointer;">
           <div class="card-badge">미완료 (+30 Gold)</div>
           <div class="game-card-icon-3d">🧩</div>
           <h4 class="card-title">미니게임 1: CPR 순서 맞추기</h4>
           <p class="card-desc">주변 안전 확인부터 구조대 도착까지 7단계 CPR 올바른 순서를 드래그하여 완성하세요!</p>
-          <a href="#minigame1-view" class="btn btn-primary" style="text-decoration: none; text-align: center; display: inline-block;">게임 시작 ➡️</a>
+          <button class="btn btn-primary" data-target-view="minigame1-view" style="width: 100%;">게임 시작 ➡️</button>
         </div>
 
         <!-- 미니게임 2 -->
-        <div id="mg2-status-card" class="game-select-card card-panel" onclick="window.location.hash='#minigame2-view'" style="cursor: pointer;">
+        <div id="mg2-status-card" class="game-select-card card-panel" data-target-view="minigame2-view" style="cursor: pointer;">
           <div class="card-badge">미완료 (+30 Gold)</div>
           <div class="game-card-icon-3d">🚨</div>
           <h4 class="card-title">미니게임 2: 응급상황 판단 게임</h4>
           <p class="card-desc">운동장, 체육관, 공원 등 실제 응급상황 카드에서 해서는 안 될 행동과 올바른 판단을 고르세요!</p>
-          <a href="#minigame2-view" class="btn btn-primary" style="text-decoration: none; text-align: center; display: inline-block;">게임 시작 ➡️</a>
+          <button class="btn btn-primary" data-target-view="minigame2-view" style="width: 100%;">게임 시작 ➡️</button>
         </div>
 
         <!-- 미니게임 3 -->
-        <div id="mg3-status-card" class="game-select-card card-panel" onclick="window.location.hash='#minigame3-view'" style="cursor: pointer;">
+        <div id="mg3-status-card" class="game-select-card card-panel" data-target-view="minigame3-view" style="cursor: pointer;">
           <div class="card-badge">미완료 (+40 Gold)</div>
           <div class="game-card-icon-3d">💓</div>
           <h4 class="card-title">미니게임 3: CPR 리듬 게임</h4>
           <p class="card-desc">분당 100~120회의 골든 리듬! 스페이스바와 터치로 적정 가슴압박 템포 감각을 익히세요!</p>
-          <a href="#minigame3-view" class="btn btn-primary" style="text-decoration: none; text-align: center; display: inline-block;">게임 시작 ➡️</a>
+          <button class="btn btn-primary" data-target-view="minigame3-view" style="width: 100%;">게임 시작 ➡️</button>
         </div>
 
       </div>
@@ -271,6 +271,6 @@
     </div>
   </div>
 
-  <script type="module" src="./js/main.js?v=105"></script>
+  <script type="module" src="./js/main.js?v=106"></script>
 </body>
 </html>

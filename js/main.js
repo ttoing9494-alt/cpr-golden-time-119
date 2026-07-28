@@ -43,9 +43,11 @@ class AppController {
           isAnonymous: true
         };
         authManager.updateAuthUI();
+      } else if (!user && !sessionStorage.getItem('auth_prompt_shown')) {
+        // 최초 게임 접속 시 1회 로그인 선택 모달 안내
+        const authModal = document.getElementById('auth-modal');
+        if (authModal) authModal.classList.remove('hidden');
       }
-      const authModal = document.getElementById('auth-modal');
-      if (authModal) authModal.classList.add('hidden');
     });
 
     // 2. DOM 요소 바인딩
@@ -79,28 +81,37 @@ class AppController {
     const anonBtn = document.getElementById('anon-login-btn');
     const authModal = document.getElementById('auth-modal');
 
+    const closeAuthModal = () => {
+      sessionStorage.setItem('auth_prompt_shown', 'true');
+      if (authModal) authModal.classList.add('hidden');
+    };
+
     if (googleBtn) {
       googleBtn.addEventListener('click', async () => {
         await authManager.loginWithGoogle();
-        if (authModal) authModal.classList.add('hidden');
+        closeAuthModal();
       });
     }
 
     if (anonBtn) {
       anonBtn.addEventListener('click', async () => {
         await authManager.loginAnonymously();
-        if (authModal) authModal.classList.add('hidden');
+        closeAuthModal();
       });
     }
 
-    // 내비게이션 버튼 이벤트 (start-boss-btn 제외 - 전용 핸들러로 처리)
-    document.querySelectorAll('[data-target-view]').forEach(btn => {
-      if (btn.id === 'start-boss-btn') return; // 보스전 버튼은 전용 핸들러로 처리
-      btn.addEventListener('click', (e) => {
-        const target = btn.getAttribute('data-target-view');
-        audioManager.playBeat(true);
-        this.navigateTo(target);
-      });
+    // 전역 이벤트 위임: 클릭된 모든 요소 및 조상 중 data-target-view를 추적하여 100% 화면 진입
+    document.addEventListener('click', (e) => {
+      const targetBtn = e.target.closest('[data-target-view]');
+      if (!targetBtn) return;
+      if (targetBtn.id === 'start-boss-btn') return; // 보스전 버튼은 전용 핸들러로 처리
+
+      const viewId = targetBtn.getAttribute('data-target-view');
+      if (viewId) {
+        e.preventDefault();
+        try { audioManager.playBeat(true); } catch(err) {}
+        this.navigateTo(viewId);
+      }
     });
 
     // 설정 모달 폼 컨트롤
@@ -297,9 +308,9 @@ class AppController {
       sec.classList.add('hidden');
       sec.style.display = 'none';
     });
-    document.querySelectorAll('.modal-overlay').forEach(modal => {
+    // 모달은 인라인 스타일 차단 없이 classList로만 관리
+    document.querySelectorAll('.modal-overlay:not(#auth-modal)').forEach(modal => {
       modal.classList.add('hidden');
-      modal.style.display = 'none';
     });
     const targetEl = document.getElementById(viewId);
     if (targetEl) {

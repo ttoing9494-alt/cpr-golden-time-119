@@ -115,7 +115,7 @@ export const authManager = {
     const authStatusBox = document.getElementById('header-auth-box');
     if (!authStatusBox) return;
 
-    if (this.currentUser) {
+    if (this.currentUser && !this.currentUser.isAnonymous) {
       authStatusBox.innerHTML = `
         <div class="user-profile-badge">
           ${this.currentUser.photoURL ? `<img src="${this.currentUser.photoURL}" class="user-avatar" alt="프로필">` : '👤'}
@@ -130,7 +130,7 @@ export const authManager = {
       }
     } else {
       authStatusBox.innerHTML = `
-        <button id="open-auth-modal-btn" class="btn btn-primary btn-small">
+        <button id="open-auth-modal-btn" class="btn btn-primary btn-small" style="font-weight: 800; cursor: pointer;">
           🔑 로그인
         </button>
       `;
