@@ -5,9 +5,7 @@
  * 10문제 퀴즈, 보스 HP, 플레이어 HP, 환자 생명 게이지, 경고 쉐이크 연출 및 명예의 전당 등록
  */
 
-import { BOSS_QUIZZES } from './cprData.js';
-import { audioManager } from './audio.js';
-import { storage export class BossGame {
+class BossGame {
   constructor(containerEl, onCompleteCallback, adminMode = false) {
     this.container = containerEl;
     this.onComplete = onCompleteCallback;
@@ -485,3 +483,5 @@ import { storage export class BossGame {
     });
   }
 }
+
+window.BossGame = BossGame;

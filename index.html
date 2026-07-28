@@ -139,30 +139,30 @@
       <div class="game-select-grid">
         
         <!-- 미니게임 1 -->
-        <div id="mg1-status-card" class="game-select-card card-panel" data-target-view="minigame1-view" style="cursor: pointer;">
+        <div id="mg1-status-card" class="game-select-card card-panel" data-target-view="minigame1-view" onclick="if(window.cprApp) window.cprApp.navigateTo('minigame1-view')" style="cursor: pointer;">
           <div class="card-badge">미완료 (+30 Gold)</div>
           <div class="game-card-icon-3d">🧩</div>
           <h4 class="card-title">미니게임 1: CPR 순서 맞추기</h4>
           <p class="card-desc">주변 안전 확인부터 구조대 도착까지 7단계 CPR 올바른 순서를 드래그하여 완성하세요!</p>
-          <button class="btn btn-primary" data-target-view="minigame1-view" style="width: 100%;">게임 시작 ➡️</button>
+          <button class="btn btn-primary" data-target-view="minigame1-view" onclick="if(window.cprApp) window.cprApp.navigateTo('minigame1-view')" style="width: 100%;">게임 시작 ➡️</button>
         </div>
 
         <!-- 미니게임 2 -->
-        <div id="mg2-status-card" class="game-select-card card-panel" data-target-view="minigame2-view" style="cursor: pointer;">
+        <div id="mg2-status-card" class="game-select-card card-panel" data-target-view="minigame2-view" onclick="if(window.cprApp) window.cprApp.navigateTo('minigame2-view')" style="cursor: pointer;">
           <div class="card-badge">미완료 (+30 Gold)</div>
           <div class="game-card-icon-3d">🚨</div>
           <h4 class="card-title">미니게임 2: 응급상황 판단 게임</h4>
           <p class="card-desc">운동장, 체육관, 공원 등 실제 응급상황 카드에서 해서는 안 될 행동과 올바른 판단을 고르세요!</p>
-          <button class="btn btn-primary" data-target-view="minigame2-view" style="width: 100%;">게임 시작 ➡️</button>
+          <button class="btn btn-primary" data-target-view="minigame2-view" onclick="if(window.cprApp) window.cprApp.navigateTo('minigame2-view')" style="width: 100%;">게임 시작 ➡️</button>
         </div>
 
         <!-- 미니게임 3 -->
-        <div id="mg3-status-card" class="game-select-card card-panel" data-target-view="minigame3-view" style="cursor: pointer;">
+        <div id="mg3-status-card" class="game-select-card card-panel" data-target-view="minigame3-view" onclick="if(window.cprApp) window.cprApp.navigateTo('minigame3-view')" style="cursor: pointer;">
           <div class="card-badge">미완료 (+40 Gold)</div>
           <div class="game-card-icon-3d">💓</div>
           <h4 class="card-title">미니게임 3: CPR 리듬 게임</h4>
           <p class="card-desc">분당 100~120회의 골든 리듬! 스페이스바와 터치로 적정 가슴압박 템포 감각을 익히세요!</p>
-          <button class="btn btn-primary" data-target-view="minigame3-view" style="width: 100%;">게임 시작 ➡️</button>
+          <button class="btn btn-primary" data-target-view="minigame3-view" onclick="if(window.cprApp) window.cprApp.navigateTo('minigame3-view')" style="width: 100%;">게임 시작 ➡️</button>
         </div>
 
       </div>
@@ -236,16 +236,16 @@
       </p>
       
       <div class="auth-btn-group" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-        <button id="google-login-btn" class="btn btn-primary btn-large">
+        <button id="google-login-btn" class="btn btn-primary btn-large" onclick="if(window.authManager) window.authManager.loginWithGoogle(); document.getElementById('auth-modal').classList.add('hidden');">
           <span style="font-size: 22px;">🌐</span> Google 계정으로 1초 로그인
         </button>
-        <button id="anon-login-btn" class="btn btn-secondary btn-large">
-          <span style="font-size: 22px;">👤</span> 게스트 익명으로 빠르게 로그인
+        <button id="anon-login-btn" class="btn btn-secondary btn-large" onclick="if(window.authManager) window.authManager.loginAnonymously(); document.getElementById('auth-modal').classList.add('hidden');">
+          <span style="font-size: 22px;">👤</span> 게스트 익명으로 빠르게 시작
         </button>
       </div>
 
       <div class="btn-group align-center" style="margin-top: 20px;">
-        <button class="btn btn-secondary modal-close-btn">닫기</button>
+        <button class="btn btn-secondary modal-close-btn" onclick="document.getElementById('auth-modal').classList.add('hidden');">닫기</button>
       </div>
     </div>
   </div>
@@ -274,6 +274,16 @@
     </div>
   </div>
 
-  <script type="module" src="./js/main.js?v=108"></script>
+  <script src="./js/cprData.js?v=200"></script>
+  <script src="./js/storage.js?v=200"></script>
+  <script src="./js/audio.js?v=200"></script>
+  <script src="./js/auth.js?v=200"></script>
+  <script src="./js/achievements.js?v=200"></script>
+  <script src="./js/hallOfFame.js?v=200"></script>
+  <script src="./js/minigame1.js?v=200"></script>
+  <script src="./js/minigame2.js?v=200"></script>
+  <script src="./js/minigame3.js?v=200"></script>
+  <script src="./js/bossGame.js?v=200"></script>
+  <script src="./js/main.js?v=200"></script>
 </body>
 </html>

@@ -11,7 +11,7 @@ const STORAGE_KEYS = {
   ACHIEVEMENTS: 'cpr_achievements'
 };
 
-export const storage = {
+const storage = {
   // 1. 설정 (SFX, BGM)
   getSettings() {
     try {
@@ -131,3 +131,5 @@ export const storage = {
     return false; // 이미 해금되어 있음
   }
 };
+
+window.storage = storage;

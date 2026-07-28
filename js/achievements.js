@@ -3,18 +3,15 @@
  * 업적 달성 검사 및 배지 토스트 알림 모듈
  */
 
-import { ACHIEVEMENTS } from './cprData.js';
-import { storage } from './storage.js';
-import { audioManager } from './audio.js';
-
-export const achievementsManager = {
+const achievementsManager = {
   checkAndUnlock(achievementId) {
-    const isNew = storage.unlockAchievement(achievementId);
+    const isNew = window.storage ? window.storage.unlockAchievement(achievementId) : false;
     if (isNew) {
-      const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+      const list = window.ACHIEVEMENTS_LIST || [];
+      const achievement = list.find(a => a.id === achievementId);
       if (achievement) {
         this.showAchievementToast(achievement);
-        audioManager.playGold();
+        try { window.audioManager.playGold(); } catch(e){}
       }
     }
   },
@@ -80,3 +77,5 @@ export const achievementsManager = {
     containerEl.innerHTML = html;
   }
 };
+
+window.achievementsManager = achievementsManager;

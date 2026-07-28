@@ -3,12 +3,7 @@
  * 미니게임 2: 응급상황 판단 게임 (상황 카드 및 선택 행동)
  */
 
-import { JUDGMENT_QUIZZES } from './cprData.js';
-import { audioManager } from './audio.js';
-import { storage } from './storage.js';
-import { achievementsManager } from './achievements.js';
-
-export class Minigame2 {
+class Minigame2 {
   constructor(containerEl, onCompleteCallback) {
     this.container = containerEl;
     this.onComplete = onCompleteCallback;
@@ -259,3 +254,5 @@ export class Minigame2 {
     }
   }
 }
+
+window.Minigame2 = Minigame2;

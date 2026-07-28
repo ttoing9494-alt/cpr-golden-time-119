@@ -4,7 +4,7 @@
  * 초등학교 5학년 수준에 맞춘 쉬운 설명과 정확한 교육 내용
  */
 
-export const CPR_STEPS = [
+const CPR_STEPS = [
   {
     id: 1,
     title: "1. 주변 안전 확인",
@@ -38,7 +38,7 @@ export const CPR_STEPS = [
     title: "5. 가슴압박 실시",
     icon: "heartbeat",
     desc: "가슴 중앙(가슴뼈 아래쪽 절반)에 두 손을 깍지 끼고 1분당 100~120회 속도로 깊게 눌러요.",
-    detail: "팔꿈치를 펴고 체중을 실어 약 5cm 깊이로 강하고 빠르게 압박해야 심장에 피가 돕니다."
+    detail: "깍지를 끼는 이유는 손가락이 가슴에 닿지 않고 손바닥 아래쪽(손꿈치)으로만 강한 힘을 정확히 전달하기 위해서입니다."
   },
   {
     id: 6,
@@ -239,3 +239,9 @@ export const ACHIEVEMENTS = [
     icon: "shield-check"
   }
 ];
+
+window.CPR_STEPS = CPR_STEPS;
+window.EMERGENCY_SCENARIOS = EMERGENCY_SCENARIOS;
+window.JUDGMENT_QUIZZES = EMERGENCY_SCENARIOS;
+window.BOSS_QUIZZES = BOSS_QUIZZES;
+window.ACHIEVEMENTS_LIST = ACHIEVEMENTS_LIST;

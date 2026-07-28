@@ -3,12 +3,7 @@
  * 미니게임 1: CPR 순서 맞추기 (드래그 앤 드롭 & 모바일 터치 순서 선택)
  */
 
-import { CPR_STEPS } from './cprData.js';
-import { audioManager } from './audio.js';
-import { storage } from './storage.js';
-import { achievementsManager } from './achievements.js';
-
-export class Minigame1 {
+class Minigame1 {
   constructor(containerEl, onCompleteCallback) {
     this.container = containerEl;
     this.onComplete = onCompleteCallback;
@@ -406,3 +401,5 @@ export class Minigame1 {
     modalOverlay.classList.remove('hidden');
   }
 }
+
+window.Minigame1 = Minigame1;

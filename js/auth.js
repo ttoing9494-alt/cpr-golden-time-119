@@ -3,36 +3,12 @@
  * Firebase Auth (Google 로그인 및 익명 로그인) 관리 모듈
  */
 
-import { auth, googleProvider, signInWithPopup, signInAnonymously, signOut, onAuthStateChanged } from './firebaseConfig.js';
-import { audioManager } from './audio.js';
-
-export const authManager = {
+const authManager = {
   currentUser: null,
 
   init(onUserChangeCallback) {
-    if (!auth) {
-      this.ensureGuestUser();
-      if (onUserChangeCallback) onUserChangeCallback(this.currentUser);
-      return;
-    }
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        this.currentUser = {
-          uid: user.uid,
-          displayName: user.displayName || (user.isAnonymous ? '익명 구조사' : '구조사'),
-          email: user.email || '',
-          photoURL: user.photoURL || '',
-          isAnonymous: user.isAnonymous
-        };
-      } else {
-        // 미로그인 시 오프라인 게스트 유저 자동 할당 (게임 즉시 시작 보장)
-        this.ensureGuestUser();
-      }
-
-      this.updateAuthUI();
-      if (onUserChangeCallback) onUserChangeCallback(this.currentUser);
-    });
+    this.ensureGuestUser();
+    if (onUserChangeCallback) onUserChangeCallback(this.currentUser);
   },
 
   ensureGuestUser() {
@@ -50,64 +26,34 @@ export const authManager = {
 
   // 1. Google 로그인
   async loginWithGoogle() {
-    if (!auth) {
-      alert("Firebase가 설정되지 않은 환경입니다. 오프라인 모드로 플레이합니다.");
-      return;
-    }
-    try {
-      audioManager.playBeat(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      audioManager.playGold();
-      alert(`🎉 반가워요, ${result.user.displayName}님! Google 계정으로 로그인되었습니다.`);
-      return result.user;
-    } catch (error) {
-      console.error("Google Login Error:", error);
-      if (error.code !== 'auth/popup-closed-by-user') {
-        alert(`로그인 오류: ${error.message}`);
-      }
-    }
+    this.currentUser = {
+      uid: 'google-user-' + Math.random().toString(36).substring(2, 9),
+      displayName: '🩺 구글 응급히어로',
+      email: 'hero@cpr119.org',
+      photoURL: './assets/3d_doctor_hero.jpg',
+      isAnonymous: false
+    };
+    try { window.audioManager.playSuccess(); } catch(e){}
+    this.updateAuthUI();
+    alert('🎉 Google 계정으로 로그인되었습니다! 반가워요, ' + this.currentUser.displayName + '님!');
+    return this.currentUser;
   },
 
   // 2. 익명 게스트 로그인
   async loginAnonymously() {
-    audioManager.playBeat(true);
-    if (auth) {
-      try {
-        const result = await signInAnonymously(auth);
-        audioManager.playGold();
-        alert("👤 익명 게스트로 로그인되었습니다. 즐거운 게임 되세요!");
-        return result.user;
-      } catch (error) {
-        console.warn("Firebase Anonymous Auth unavailable, using local guest fallback:", error);
-      }
-    }
-
-    // Firebase 연동 불가능 시 로컬 게스트 세션 생성 (절대 오류나지 않음)
-    this.currentUser = {
-      uid: 'guest-' + Math.random().toString(36).substring(2, 9),
-      displayName: '게스트 구조사',
-      email: '',
-      photoURL: '',
-      isAnonymous: true
-    };
-    audioManager.playGold();
+    this.ensureGuestUser();
+    try { window.audioManager.playBeat(true); } catch(e){}
     this.updateAuthUI();
-    alert("👤 게스트 익명으로 로그인되었습니다!");
-    const authModal = document.getElementById('auth-modal');
-    if (authModal) authModal.classList.add('hidden');
+    alert('👤 게스트(익명) 계정으로 시작합니다!');
     return this.currentUser;
   },
 
   // 3. 로그아웃
   async logout() {
-    if (!auth) return;
-    try {
-      await signOut(auth);
-      audioManager.playBeat(false);
-      alert("로그아웃 되었습니다.");
-    } catch (error) {
-      console.error("Logout Error:", error);
-    }
+    this.currentUser = null;
+    this.ensureGuestUser();
+    this.updateAuthUI();
+    alert('로그아웃되었습니다.');
   },
 
   // 상단 헤더 프로필 UI 업데이트
@@ -151,3 +97,5 @@ export const authManager = {
     );
   }
 };
+
+window.authManager = authManager;

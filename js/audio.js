@@ -281,4 +281,5 @@ class AudioController {
   }
 }
 
-export const audioManager = new AudioController();
+const audioManager = new AudioController();
+window.audioManager = audioManager;

@@ -3,20 +3,10 @@
  * 명예의 전당 순위표 및 기록 렌더링 모듈
  */
 
-import { storage } from './storage.js';
-import { firestoreManager } from './firestore.js';
-
-export const hallOfFameManager = {
+const hallOfFameManager = {
   async renderHallOfFamePage(containerEl) {
-    const records = await firestoreManager.getOnlineHallOfFame();
+    const records = window.storage ? window.storage.getHallOfFame() : [];
     this.renderTable(containerEl, records);
-
-    // 온라인 실시간 스냅샷 구독
-    firestoreManager.listenToHallOfFame((updatedRecords) => {
-      if (document.getElementById('hall-table-body')) {
-        this.renderTable(containerEl, updatedRecords);
-      }
-    });
   },
 
   renderTable(containerEl, records) {
@@ -88,3 +78,5 @@ export const hallOfFameManager = {
     );
   }
 };
+
+window.hallOfFameManager = hallOfFameManager;

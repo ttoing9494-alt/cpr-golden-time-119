@@ -3,11 +3,7 @@
  * 미니게임 3: CPR 리듬 게임 (가슴압박 100~120BPM 속도 유지)
  */
 
-import { audioManager } from './audio.js';
-import { storage } from './storage.js';
-import { achievementsManager } from './achievements.js';
-
-export class Minigame3 {
+class Minigame3 {
   constructor(containerEl, onCompleteCallback) {
     this.container = containerEl;
     this.onComplete = onCompleteCallback;
@@ -338,3 +334,5 @@ export class Minigame3 {
     });
   }
 }
+
+window.Minigame3 = Minigame3;

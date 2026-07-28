@@ -3,16 +3,7 @@
  * 메인 엔트리 포인트 및 SPA 화면 전환 컨트롤러
  */
 
-import { storage } from './storage.js';
-import { audioManager } from './audio.js';
-import { achievementsManager } from './achievements.js';
-import { authManager } from './auth.js';
-import { Minigame1 } from './minigame1.js';
-import { Minigame2 } from './minigame2.js';
-import { Minigame3 } from './minigame3.js';
-import { BossGame } from './bossGame.js';
-import { hallOfFameManager } from './hallOfFame.js';
-import { CPR_STEPS } from './cprData.js';
+
 
 // ✨ 관리자 모드: URL에 ?admin=true 붙이면 미니게임 링 없이 보스전 입장 + 정답 표시
 // 예시: https://cpr-golden-time-119.vercel.app/?admin=true
