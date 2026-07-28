@@ -292,16 +292,22 @@ class AppController {
   }
 
   showView(viewId) {
+    console.log("Showing view:", viewId);
     document.querySelectorAll('.view-section').forEach(sec => {
       sec.classList.add('hidden');
+      sec.style.display = 'none';
     });
     document.querySelectorAll('.modal-overlay').forEach(modal => {
       modal.classList.add('hidden');
+      modal.style.display = 'none';
     });
     const targetEl = document.getElementById(viewId);
     if (targetEl) {
       targetEl.classList.remove('hidden');
+      targetEl.style.display = 'flex';
       window.scrollTo(0, 0);
+    } else {
+      console.error("Target view element not found:", viewId);
     }
   }
 

@@ -156,15 +156,6 @@ body::before {
   display: none !important;
 }
 
-/* 순수 CSS :target 폴백 규칙 (자바스크립트 오프라인/차단 시에도 100% 화면 진입 보장) */
-.view-section:target {
-  display: flex !important;
-}
-
-:target ~ #home-view {
-  display: none !important;
-}
-
 /* 3D Interactive Card Panels */
 .card-panel {
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
