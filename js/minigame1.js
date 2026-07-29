@@ -303,18 +303,20 @@ class Minigame1 {
 
     if (stepId !== null) {
       const steps = window.CPR_STEPS && window.CPR_STEPS.length > 0 ? window.CPR_STEPS : [
-        { id: 1, title: "1. 주변 안전 확인" },
-        { id: 2, title: "2. 의식 확인" },
-        { id: 3, title: "3. 119 신고 및 AED 요청" },
-        { id: 4, title: "4. 호흡 확인" },
-        { id: 5, title: "5. 가슴압박 실시" },
-        { id: 6, title: "6. AED 사용" },
-        { id: 7, title: "7. 구조대 도착까지 계속" }
+        { id: 1, title: "주변 안전 확인" },
+        { id: 2, title: "의식 확인" },
+        { id: 3, title: "119 신고 및 AED 요청" },
+        { id: 4, title: "호흡 확인" },
+        { id: 5, title: "가슴압박 실시" },
+        { id: 6, title: "AED 사용" },
+        { id: 7, title: "구조대 도착까지 계속" }
       ];
       const stepObj = steps.find(s => s.id === stepId) || { title: `${stepId}단계` };
+      // 앞에 정답 번호("1. ", "2. " 등) 지우기
+      const titleNoNum = (stepObj.title || '').replace(/^\d+\.\s*/, '');
       slotEl.innerHTML = `
         <div class="cpr-card placed">
-          <div class="card-title">${stepObj.title}</div>
+          <div class="card-title">${titleNoNum}</div>
         </div>
       `;
       slotEl.classList.add('has-card');

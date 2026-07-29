@@ -110,7 +110,7 @@ class Minigame2 {
 
         <div class="options-container" id="mg2-options-box" style="display: flex; flex-direction: column; gap: 14px;">
           ${quiz.options.map((opt, idx) => `
-            <button class="option-btn card-panel" onclick="window.activeMg2.checkAnswer(${idx})" style="display: flex; align-items: center; text-align: left; padding: 18px 20px; background: rgba(15,23,42,0.85); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; cursor: pointer; transition: all 0.2s; width: 100%;">
+            <button class="option-btn card-panel" data-idx="${idx}" onclick="window.activeMg2.checkAnswer(${idx})" style="display: flex; align-items: center; text-align: left; padding: 18px 20px; background: rgba(15,23,42,0.85); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; cursor: pointer; transition: all 0.2s; width: 100%;">
               <span class="opt-num" style="background: ${idx === 0 ? '#38bdf8' : '#f43f5e'}; color: white; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin-right: 16px; flex-shrink: 0;">${idx === 0 ? 'A' : 'B'}</span>
               <span class="opt-text" style="font-size: 16px; color: #f8fafc; font-weight: 600; line-height: 1.4;">${opt.text}</span>
             </button>
@@ -120,6 +120,21 @@ class Minigame2 {
         <div id="mg2-inline-feedback" style="margin-top: 20px; display: none;"></div>
       </div>
     `;
+
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    const btns = this.container.querySelectorAll('.option-btn');
+    btns.forEach(btn => {
+      const handler = (e) => {
+        e.preventDefault();
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        this.checkAnswer(idx);
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('touchend', handler);
+    });
   }
 
   checkAnswer(selectedIdx) {
@@ -167,17 +182,27 @@ class Minigame2 {
           </p>
         </div>
 
-        <button class="btn btn-primary btn-large" onclick="window.activeMg2.nextQuestion()" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
-          다음 문제로 이동하기 ➡️
+        <button id="mg2-next-btn" class="btn btn-primary btn-large" onclick="window.activeMg2.nextQuestion()" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+          다음 문제로 이동하기 ➡️ (자동 이동 중...)
         </button>
       `;
 
-      // 결과 화면 스크롤
       feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+
+    // 1.5초 후 자동 다음 문제 이동
+    if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
+    this.autoNextTimeout = setTimeout(() => {
+      this.nextQuestion();
+    }, 1600);
   }
 
   nextQuestion() {
+    if (this.autoNextTimeout) {
+      clearTimeout(this.autoNextTimeout);
+      this.autoNextTimeout = null;
+    }
+
     const quizzes = window.JUDGMENT_QUIZZES || [];
     this.currentIndex++;
 
