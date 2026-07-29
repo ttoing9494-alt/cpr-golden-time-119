@@ -11,12 +11,16 @@ class Minigame2 {
     this.score = 0;
     this.timer = 60;
     this.timerInterval = null;
+    this.selectedIdx = null;
+    window.activeMg2 = this;
   }
 
   init() {
     this.currentIndex = 0;
     this.score = 0;
     this.timer = 60;
+    this.selectedIdx = null;
+    window.activeMg2 = this;
     this.render();
     this.startTimer();
   }
@@ -41,42 +45,19 @@ class Minigame2 {
 
   handleTimeOut() {
     try { window.audioManager.playWrong(); } catch(e){}
-    const modalOverlay = this.container.querySelector('#mg2-feedback-modal');
-    const modalTitle = this.container.querySelector('#mg2-modal-title');
-    const modalBody = this.container.querySelector('#mg2-modal-body');
-    const modalCloseGroup = this.container.querySelector('#mg2-feedback-modal .btn-group');
+    this.stopTimer();
 
-    if (modalTitle) {
-      modalTitle.innerHTML = `⏰ 제한시간 초과!`;
-      modalTitle.className = 'modal-title error-text';
-    }
-    if (modalBody) {
-      modalBody.innerHTML = `
-        <p class="result-highlight">제한시간 내에 응급상황 판단 문제를 모두 완료하지 못했습니다.</p>
-        <p class="section-desc">다시 한번 도전하여 올바른 판단을 내리는 훈련을 해보세요!</p>
-      `;
-    }
-
-    if (modalCloseGroup) {
-      modalCloseGroup.innerHTML = `
-        <button id="mg2-retry-btn" class="btn btn-primary">🔄 다시 도전하기</button>
-        <button id="mg2-home-btn" class="btn btn-secondary">🏠 메인 화면으로</button>
-      `;
-
-      const retryBtn = this.container.querySelector('#mg2-retry-btn');
-      if (retryBtn) retryBtn.onclick = () => {
-        if (modalOverlay) modalOverlay.classList.add('hidden');
-        this.init();
-      };
-
-      const homeBtn = this.container.querySelector('#mg2-home-btn');
-      if (homeBtn) homeBtn.onclick = () => {
-        if (modalOverlay) modalOverlay.classList.add('hidden');
-        if (this.onComplete) this.onComplete();
-      };
-    }
-
-    if (modalOverlay) modalOverlay.classList.remove('hidden');
+    this.container.innerHTML = `
+      <div class="minigame-wrapper card-panel align-center" style="padding: 24px;">
+        <h3 class="modal-title error-text" style="font-size: 24px; color: #f87171;">⏰ 제한시간 초과!</h3>
+        <p class="result-highlight" style="font-size: 16px; margin: 16px 0; color: #f8fafc;">제한시간 내에 응급상황 판단 문제를 모두 완료하지 못했습니다.</p>
+        <p class="section-desc" style="color: #cbd5e1; margin-bottom: 24px;">다시 한번 도전하여 올바른 판단을 내리는 훈련을 해보세요!</p>
+        <div class="btn-group align-center" style="display: flex; gap: 12px; justify-content: center;">
+          <button class="btn btn-primary" onclick="window.activeMg2.init()">🔄 다시 도전하기</button>
+          <button class="btn btn-secondary" onclick="if(window.activeMg2.onComplete) window.activeMg2.onComplete()">🏠 메인 화면으로</button>
+        </div>
+      </div>
+    `;
   }
 
   stopTimer() {
@@ -87,21 +68,24 @@ class Minigame2 {
   }
 
   render() {
+    window.activeMg2 = this;
     const quizzes = window.JUDGMENT_QUIZZES || [];
     const quiz = quizzes[this.currentIndex] || {
-      situation: "응급 상황이 발생했습니다.",
-      question: "올바른 행동을 선택하세요.",
+      situation: "운동장에서 친구가 갑자기 쓰러졌습니다! 주변에 차나 운동기구가 있습니다.",
+      question: "쓰러진 친구를 발견했을 때 가장 먼저 해야 할 행동은 무엇일까요?",
       options: [
-        { text: "안전을 확인하고 119에 신고한다.", correct: true, reason: "올바른 선택입니다." },
-        { text: "당황하여 아무것도 하지 않는다.", correct: false, reason: "신속한 조치가 필요합니다." }
+        { text: "주변에 위험한 것이 없는지 먼저 안전을 확인한다.", correct: true, reason: "구조자의 안전이 확보되어야 2차 사고 없이 친구를 안전하게 도울 수 있습니다!" },
+        { text: "친구를 일으켜 세우려고 억지로 끌어당긴다.", correct: false, reason: "의식이 없는 사람을 무리하게 일으키면 척추나 뼈가 다칠 수 있습니다." }
       ]
     };
+
+    this.selectedIdx = null;
 
     this.container.innerHTML = `
       <div class="minigame-wrapper card-panel" style="padding: 20px;">
         <div class="minigame-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <div>
-            <div class="game-badge" style="display: inline-block; background: #38bdf8; color: #0f172a; font-weight: 800; padding: 2px 10px; border-radius: 12px; font-size: 13px;">미니게임 2</div>
+            <div class="game-badge" style="display: inline-block; background: #38bdf8; color: #0f172a; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 13px;">미니게임 2</div>
             <h2 class="game-title" style="margin-top: 6px; font-size: 22px; color: white;">🚨 응급상황 올바른 판단 게임</h2>
           </div>
           <div class="timer-box" style="background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 20px; font-weight: 700;">남은 시간: <span id="mg2-timer" class="timer-val" style="color: #f43f5e;">${this.timer}초</span></div>
@@ -124,96 +108,84 @@ class Minigame2 {
           <h3 class="question-text" style="font-size: 19px; color: #facc15; font-weight: 700;">❓ ${quiz.question}</h3>
         </div>
 
-        <div class="options-container" style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="options-container" id="mg2-options-box" style="display: flex; flex-direction: column; gap: 14px;">
           ${quiz.options.map((opt, idx) => `
-            <button class="option-btn card-panel" data-idx="${idx}" style="display: flex; align-items: center; text-align: left; padding: 16px 20px; background: rgba(15,23,42,0.8); border: 2px solid rgba(255,255,255,0.15); border-radius: 14px; cursor: pointer; transition: all 0.2s;">
-              <span class="opt-num" style="background: ${idx === 0 ? '#38bdf8' : '#f43f5e'}; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin-right: 16px; flex-shrink: 0;">${idx === 0 ? 'A' : 'B'}</span>
+            <button class="option-btn card-panel" onclick="window.activeMg2.checkAnswer(${idx})" style="display: flex; align-items: center; text-align: left; padding: 18px 20px; background: rgba(15,23,42,0.85); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; cursor: pointer; transition: all 0.2s; width: 100%;">
+              <span class="opt-num" style="background: ${idx === 0 ? '#38bdf8' : '#f43f5e'}; color: white; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin-right: 16px; flex-shrink: 0;">${idx === 0 ? 'A' : 'B'}</span>
               <span class="opt-text" style="font-size: 16px; color: #f8fafc; font-weight: 600; line-height: 1.4;">${opt.text}</span>
             </button>
           `).join('')}
         </div>
 
-        <div id="mg2-feedback-modal" class="modal-overlay hidden">
-          <div class="modal-content card-panel" style="max-width: 500px; padding: 24px;">
-            <h3 id="mg2-modal-title" class="modal-title" style="font-size: 22px; margin-bottom: 12px;"></h3>
-            <div id="mg2-modal-body" class="modal-body" style="margin-bottom: 20px;"></div>
-            <div class="btn-group align-center">
-              <button id="mg2-modal-next" class="btn btn-primary" style="padding: 12px 24px; font-weight: 800;">다음 문제로 ➡️</button>
-            </div>
-          </div>
-        </div>
+        <div id="mg2-inline-feedback" style="margin-top: 20px; display: none;"></div>
       </div>
     `;
-
-    this.bindEvents();
-  }
-
-  bindEvents() {
-    const optionBtns = this.container.querySelectorAll('.option-btn');
-    optionBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const selectedIdx = parseInt(btn.getAttribute('data-idx'));
-        this.checkAnswer(selectedIdx);
-      });
-    });
   }
 
   checkAnswer(selectedIdx) {
+    if (this.selectedIdx !== null) return; // 이미 답변 선택함
+    this.selectedIdx = selectedIdx;
+
     const quizzes = window.JUDGMENT_QUIZZES || [];
     const quiz = quizzes[this.currentIndex];
     if (!quiz) return;
-    const selectedOption = quiz.options[selectedIdx];
 
-    const modalOverlay = this.container.querySelector('#mg2-feedback-modal');
-    const modalTitle = this.container.querySelector('#mg2-modal-title');
-    const modalBody = this.container.querySelector('#mg2-modal-body');
-    const modalNext = this.container.querySelector('#mg2-modal-next');
+    const selectedOption = quiz.options[selectedIdx];
+    const feedbackBox = this.container.querySelector('#mg2-inline-feedback');
+    const optionsBox = this.container.querySelector('#mg2-options-box');
 
     if (selectedOption.correct) {
       this.score++;
       try { window.audioManager.playCorrect(); } catch(e){}
-      if (modalTitle) {
-        modalTitle.innerHTML = `⭕ 정답입니다! 훌륭해요!`;
-        modalTitle.className = 'modal-title success-text';
-      }
-      if (modalBody) {
-        modalBody.innerHTML = `
-          <div class="explanation-box success-box" style="background: rgba(34,197,94,0.15); border: 1px solid #22c55e; padding: 14px; border-radius: 10px; color: #f8fafc;">
-            <h4 style="color: #4ade80; margin-bottom: 6px;">💡 생명을 구하는 쉬운 해설:</h4>
-            <p style="line-height: 1.5; font-size: 15px;">${selectedOption.reason}</p>
-          </div>
-        `;
-      }
     } else {
       try { window.audioManager.playWrong(); } catch(e){}
-      if (modalTitle) {
-        modalTitle.innerHTML = `❌ 잘못된 판단입니다!`;
-        modalTitle.className = 'modal-title error-text';
-      }
-      if (modalBody) {
-        modalBody.innerHTML = `
-          <div class="explanation-box warning-box" style="background: rgba(239,68,68,0.15); border: 1px solid #ef4444; padding: 14px; border-radius: 10px; color: #f8fafc;">
-            <h4 style="color: #f87171; margin-bottom: 6px;">⚠️ 왜 잘못되었을까요?</h4>
-            <p style="line-height: 1.5; font-size: 15px;">${selectedOption.reason}</p>
-          </div>
-        `;
-      }
     }
 
-    if (modalNext) {
-      modalNext.onclick = () => {
-        if (modalOverlay) modalOverlay.classList.add('hidden');
-        this.currentIndex++;
-
-        if (this.currentIndex < quizzes.length) {
-          this.render();
+    // 선택 버튼 비활성화 및 색상 하이라이트
+    if (optionsBox) {
+      const btns = optionsBox.querySelectorAll('.option-btn');
+      btns.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === selectedIdx) {
+          btn.style.border = selectedOption.correct ? '3px solid #22c55e' : '3px solid #ef4444';
+          btn.style.background = selectedOption.correct ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
         } else {
-          this.finishGame();
+          btn.style.opacity = '0.5';
         }
-      };
+      });
     }
 
-    if (modalOverlay) modalOverlay.classList.remove('hidden');
+    if (feedbackBox) {
+      feedbackBox.style.display = 'block';
+      feedbackBox.innerHTML = `
+        <div class="feedback-card" style="background: ${selectedOption.correct ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}; border: 2px solid ${selectedOption.correct ? '#22c55e' : '#ef4444'}; padding: 18px; border-radius: 14px; margin-bottom: 20px;">
+          <h3 style="color: ${selectedOption.correct ? '#4ade80' : '#f87171'}; font-size: 20px; font-weight: 800; margin-bottom: 8px;">
+            ${selectedOption.correct ? '⭕ 정답입니다! 훌륭한 판단이에요!' : '❌ 잘못된 판단입니다!'}
+          </h3>
+          <p style="color: #f8fafc; font-size: 16px; line-height: 1.5; font-weight: 600;">
+            ${selectedOption.reason}
+          </p>
+        </div>
+
+        <button class="btn btn-primary btn-large" onclick="window.activeMg2.nextQuestion()" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+          다음 문제로 이동하기 ➡️
+        </button>
+      `;
+
+      // 결과 화면 스크롤
+      feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  nextQuestion() {
+    const quizzes = window.JUDGMENT_QUIZZES || [];
+    this.currentIndex++;
+
+    if (this.currentIndex < quizzes.length) {
+      this.render();
+    } else {
+      this.finishGame();
+    }
   }
 
   finishGame() {

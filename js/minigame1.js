@@ -268,7 +268,6 @@ class Minigame1 {
   }
 
   placeCardInSlot(stepId, slotIdx) {
-    // 기존에 다른 슬롯에 배치되어 있었다면 제거
     const existingIdx = this.userOrder.indexOf(stepId);
     if (existingIdx !== -1) {
       this.userOrder[existingIdx] = null;
@@ -278,14 +277,14 @@ class Minigame1 {
     this.userOrder[slotIdx] = stepId;
     this.updateSlotUI(slotIdx);
     this.updateSourcePoolUI();
-    audioManager.playBeat(true);
+    try { window.audioManager.playBeat(true); } catch(e){}
   }
 
   removeCardFromSlot(slotIdx) {
     this.userOrder[slotIdx] = null;
     this.updateSlotUI(slotIdx);
     this.updateSourcePoolUI();
-    audioManager.playBeat(false);
+    try { window.audioManager.playBeat(false); } catch(e){}
   }
 
   resetSlots() {
@@ -303,7 +302,16 @@ class Minigame1 {
     if (!slotEl) return;
 
     if (stepId !== null) {
-      const stepObj = CPR_STEPS.find(s => s.id === stepId);
+      const steps = window.CPR_STEPS && window.CPR_STEPS.length > 0 ? window.CPR_STEPS : [
+        { id: 1, title: "1. 주변 안전 확인" },
+        { id: 2, title: "2. 의식 확인" },
+        { id: 3, title: "3. 119 신고 및 AED 요청" },
+        { id: 4, title: "4. 호흡 확인" },
+        { id: 5, title: "5. 가슴압박 실시" },
+        { id: 6, title: "6. AED 사용" },
+        { id: 7, title: "7. 구조대 도착까지 계속" }
+      ];
+      const stepObj = steps.find(s => s.id === stepId) || { title: `${stepId}단계` };
       slotEl.innerHTML = `
         <div class="cpr-card placed">
           <div class="card-title">${stepObj.title}</div>
@@ -332,7 +340,7 @@ class Minigame1 {
 
   checkResult() {
     if (this.userOrder.includes(null)) {
-      audioManager.playWrong();
+      try { window.audioManager.playWrong(); } catch(e){}
       alert('7개 단계를 모두 슬롯에 채워주셔야 검사가 가능합니다!');
       return;
     }
@@ -352,63 +360,90 @@ class Minigame1 {
     const modalBody = this.container.querySelector('#mg1-modal-body');
     const modalClose = this.container.querySelector('#mg1-modal-close');
 
+    const steps = window.CPR_STEPS && window.CPR_STEPS.length > 0 ? window.CPR_STEPS : [
+      { id: 1, title: "1. 주변 안전 확인", desc: "위험 요소 확인", detail: "구조자 안전 확보" },
+      { id: 2, title: "2. 의식 확인", desc: "어깨 두드리기", detail: "가볍게 두드리며 의식 관찰" },
+      { id: 3, title: "3. 119 신고 및 AED 요청", desc: "구체적 지목", detail: "특정 사람 지목하여 신고 요청" },
+      { id: 4, title: "4. 호흡 확인", desc: "10초 이내 호흡 관찰", detail: "비정상 헐떡임 체크" },
+      { id: 5, title: "5. 가슴압박 실시", desc: "100~120BPM 압박", detail: "깍지 끼고 5cm 깊이 압박" },
+      { id: 6, title: "6. AED 사용", desc: "전원 및 패치 부착", detail: "음성 안내대로 충격" },
+      { id: 7, title: "7. 구조대 도착까지 계속", desc: "계속 압박 유지", detail: "인계받을 때까지 계속" }
+    ];
+
     if (isCorrect) {
       this.stopTimer();
-      audioManager.playVictory();
-      audioManager.playGold();
+      try {
+        window.audioManager.playVictory();
+        window.audioManager.playGold();
+      } catch(e){}
 
-      modalTitle.innerHTML = `🎉 완벽합니다! CPR 7단계 완성!`;
-      modalTitle.className = 'modal-title success-text';
-      modalBody.innerHTML = `
-        <p class="result-highlight">축하합니다! 올바른 심폐소생술 순서를 완벽하게 기억하고 계시네요!</p>
-        <div class="explanation-box">
-          <h4>💡 왜 이 순서가 중요할까요?</h4>
-          <ol class="step-summary-list">
-            ${CPR_STEPS.map(s => `<li><strong>${s.title}</strong>: ${s.detail}</li>`).join('')}
-          </ol>
-        </div>
-        <div class="gold-reward-animation">
-          <span class="gold-icon">💰</span>
-          <span class="gold-amount">+30 Gold 획득!</span>
-        </div>
-      `;
+      if (modalTitle) {
+        modalTitle.innerHTML = `🎉 완벽합니다! CPR 7단계 완성!`;
+        modalTitle.className = 'modal-title success-text';
+      }
+      if (modalBody) {
+        modalBody.innerHTML = `
+          <p class="result-highlight">축하합니다! 올바른 심폐소생술 순서를 완벽하게 기억하고 계시네요!</p>
+          <div class="explanation-box">
+            <h4>💡 왜 이 순서가 중요할까요?</h4>
+            <ol class="step-summary-list">
+              ${steps.map(s => `<li><strong>${s.title}</strong>: ${s.detail || s.desc}</li>`).join('')}
+            </ol>
+          </div>
+          <div class="gold-reward-animation">
+            <span class="gold-icon">💰</span>
+            <span class="gold-amount">+30 Gold 획득!</span>
+          </div>
+        `;
+      }
 
-      modalClose.onclick = () => {
-        modalOverlay.classList.add('hidden');
-        // 골드 및 진행 상황 저장
-        const curProgress = storage.getProgress();
-        if (!curProgress.minigame1Cleared) {
-          curProgress.minigame1Cleared = true;
-          curProgress.gold += 30;
-          storage.saveProgress(curProgress);
-        }
+      if (modalClose) {
+        modalClose.onclick = () => {
+          if (modalOverlay) modalOverlay.classList.add('hidden');
+          if (window.storage) {
+            const curProgress = window.storage.getProgress();
+            if (!curProgress.minigame1Cleared) {
+              curProgress.minigame1Cleared = true;
+              curProgress.gold += 30;
+              window.storage.saveProgress(curProgress);
+            }
+          }
 
-        achievementsManager.checkAndUnlock('first_rescue');
-        achievementsManager.checkAndUnlock('cpr_expert');
+          if (window.achievementsManager) {
+            window.achievementsManager.checkAndUnlock('first_cpr');
+            window.achievementsManager.checkAndUnlock('perfect_order');
+          }
 
-        if (this.onComplete) this.onComplete();
-      };
+          if (this.onComplete) this.onComplete();
+        };
+      }
     } else {
-      audioManager.playWrong();
-      modalTitle.innerHTML = `❌ 잘못된 순서가 있습니다`;
-      modalTitle.className = 'modal-title error-text';
-      modalBody.innerHTML = `
-        <p class="result-highlight">아쉽습니다! <strong>${wrongIndices.join(', ')}단계</strong> 순서가 올바르지 않습니다.</p>
-        <div class="explanation-box warning-box">
-          <h4>📌 올바른 CPR 7단계 순서 안내:</h4>
-          <ol>
-            ${(window.CPR_STEPS || []).map(s => `<li>${s.title} (${s.desc})</li>`).join('')}
-          </ol>
-        </div>
-        <p>순서를 잘 확인하고 다시 한번 시도해 보세요!</p>
-      `;
+      try { window.audioManager.playWrong(); } catch(e){}
+      if (modalTitle) {
+        modalTitle.innerHTML = `❌ 잘못된 순서가 있습니다`;
+        modalTitle.className = 'modal-title error-text';
+      }
+      if (modalBody) {
+        modalBody.innerHTML = `
+          <p class="result-highlight">아쉽습니다! <strong>${wrongIndices.join(', ')}단계</strong> 순서가 올바르지 않습니다.</p>
+          <div class="explanation-box warning-box">
+            <h4>📌 올바른 CPR 7단계 순서 안내:</h4>
+            <ol>
+              ${steps.map(s => `<li>${s.title} (${s.desc})</li>`).join('')}
+            </ol>
+          </div>
+          <p>순서를 잘 확인하고 다시 한번 시도해 보세요!</p>
+        `;
+      }
 
-      modalClose.onclick = () => {
-        modalOverlay.classList.add('hidden');
-      };
+      if (modalClose) {
+        modalClose.onclick = () => {
+          if (modalOverlay) modalOverlay.classList.add('hidden');
+        };
+      }
     }
 
-    modalOverlay.classList.remove('hidden');
+    if (modalOverlay) modalOverlay.classList.remove('hidden');
   }
 }
 
