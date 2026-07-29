@@ -110,7 +110,7 @@ class Minigame2 {
 
         <div class="options-container" id="mg2-options-box" style="display: flex; flex-direction: column; gap: 14px;">
           ${quiz.options.map((opt, idx) => `
-            <button class="option-btn card-panel" data-idx="${idx}" onclick="window.activeMg2.checkAnswer(${idx})" style="display: flex; align-items: center; text-align: left; padding: 18px 20px; background: rgba(15,23,42,0.85); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; cursor: pointer; transition: all 0.2s; width: 100%;">
+            <button class="option-btn card-panel" data-idx="${idx}" style="display: flex; align-items: center; text-align: left; padding: 18px 20px; background: rgba(15,23,42,0.85); border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; cursor: pointer; transition: all 0.2s; width: 100%;">
               <span class="opt-num" style="background: ${idx === 0 ? '#38bdf8' : '#f43f5e'}; color: white; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; margin-right: 16px; flex-shrink: 0;">${idx === 0 ? 'A' : 'B'}</span>
               <span class="opt-text" style="font-size: 16px; color: #f8fafc; font-weight: 600; line-height: 1.4;">${opt.text}</span>
             </button>
@@ -127,12 +127,13 @@ class Minigame2 {
   bindEvents() {
     const btns = this.container.querySelectorAll('.option-btn');
     btns.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.onclick = (e) => {
+        if (e) e.preventDefault();
         const idx = parseInt(btn.getAttribute('data-idx'));
         if (!isNaN(idx)) {
           this.checkAnswer(idx);
         }
-      });
+      };
     });
   }
 
@@ -161,6 +162,7 @@ class Minigame2 {
       const btns = optionsBox.querySelectorAll('.option-btn');
       btns.forEach((btn, idx) => {
         btn.disabled = true;
+        btn.onclick = null; // 중복 클릭 차단
         if (idx === selectedIdx) {
           btn.style.border = selectedOption.correct ? '3px solid #22c55e' : '3px solid #ef4444';
           btn.style.background = selectedOption.correct ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
@@ -183,7 +185,7 @@ class Minigame2 {
         </div>
 
         <button id="mg2-next-btn" class="btn btn-primary btn-large" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
-          다음 문제로 이동하기 ➡️ (잠시 후 자동 이동)
+          다음 문제로 이동하기 ➡️
         </button>
       `;
 
@@ -200,11 +202,11 @@ class Minigame2 {
       } catch(e){}
     }
 
-    // 1.2초 후 자동 다음 문제 이동
+    // 1.5초 후 자동 다음 문제 이동
     if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
     this.autoNextTimeout = setTimeout(() => {
       this.nextQuestion();
-    }, 1200);
+    }, 1500);
   }
 
   nextQuestion() {
@@ -213,6 +215,7 @@ class Minigame2 {
       this.autoNextTimeout = null;
     }
 
+    this.selectedIdx = null; // 초기화
     const quizzes = window.JUDGMENT_QUIZZES || [];
     this.currentIndex++;
 
