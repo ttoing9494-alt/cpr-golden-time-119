@@ -167,15 +167,16 @@ class Minigame2 {
       try { window.audioManager.playWrong(); } catch(e){}
     }
 
-    // 선택 버튼 비활성화 및 색상 하이라이트
+    // 선택 버튼 즉시 3D 하이라이트
     if (optionsBox) {
       const btns = optionsBox.querySelectorAll('.option-btn');
       btns.forEach((btn, idx) => {
         if (idx === selectedIdx) {
-          btn.style.border = selectedOption.correct ? '3px solid #22c55e' : '3px solid #ef4444';
-          btn.style.background = selectedOption.correct ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
+          btn.style.border = selectedOption.correct ? '4px solid #22c55e' : '4px solid #ef4444';
+          btn.style.background = selectedOption.correct ? 'rgba(34,197,94,0.35)' : 'rgba(239,68,68,0.35)';
+          btn.style.transform = 'scale(1.03)';
         } else {
-          btn.style.opacity = '0.5';
+          btn.style.opacity = '0.35';
         }
       });
     }
@@ -183,31 +184,23 @@ class Minigame2 {
     if (feedbackBox) {
       feedbackBox.style.display = 'block';
       feedbackBox.innerHTML = `
-        <div class="feedback-card" onclick="window.activeMg2.nextQuestion()" style="background: ${selectedOption.correct ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}; border: 2px solid ${selectedOption.correct ? '#22c55e' : '#ef4444'}; padding: 18px; border-radius: 14px; margin-bottom: 20px; cursor: pointer;">
-          <h3 style="color: ${selectedOption.correct ? '#4ade80' : '#f87171'}; font-size: 20px; font-weight: 800; margin-bottom: 8px;">
+        <div class="feedback-card" onclick="if(window.activeMg2) window.activeMg2.nextQuestion()" style="background: ${selectedOption.correct ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}; border: 2px solid ${selectedOption.correct ? '#22c55e' : '#ef4444'}; padding: 16px; border-radius: 14px; margin-top: 14px; cursor: pointer;">
+          <h3 style="color: ${selectedOption.correct ? '#4ade80' : '#f87171'}; font-size: 19px; font-weight: 800; margin-bottom: 6px;">
             ${selectedOption.correct ? '⭕ 정답입니다! 훌륭한 판단이에요!' : '❌ 잘못된 판단입니다!'}
           </h3>
-          <p style="color: #f8fafc; font-size: 16px; line-height: 1.5; font-weight: 600;">
+          <p style="color: #f8fafc; font-size: 15px; line-height: 1.5; font-weight: 600;">
             ${selectedOption.reason}
           </p>
-          <div style="font-size: 13px; color: #facc15; font-weight: 700; margin-top: 8px;">👉 카드나 아래 버튼을 누르시면 즉시 다음 문제로 넘어갑니다!</div>
+          <div style="font-size: 13px; color: #facc15; font-weight: 800; margin-top: 8px; text-align: center;">⚡ 다음 문제로 이동 중... (터치 시 즉시 전환)</div>
         </div>
-
-        <button id="mg2-next-btn" class="btn btn-primary btn-large" onclick="if(window.activeMg2) window.activeMg2.nextQuestion()" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
-          다음 문제로 즉시 이동 ➡️
-        </button>
       `;
-
-      try {
-        feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } catch(e){}
     }
 
-    // 0.6초 후 자동 다음 문제 이동
+    // 0.45초 후 자동 다음 문제 이동
     if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
     this.autoNextTimeout = setTimeout(() => {
       this.nextQuestion();
-    }, 600);
+    }, 450);
   }
 
   nextQuestion() {
