@@ -14,7 +14,16 @@ class Minigame1 {
   }
 
   init() {
-    const steps = window.CPR_STEPS || [];
+    const defaultSteps = [
+      { id: 1, title: "1. 주변 안전 확인", desc: "구조자 자신과 쓰러진 사람 주변의 위험 요소를 먼저 확인해요." },
+      { id: 2, title: "2. 의식 확인", desc: "어깨를 가볍게 톡톡 두드리며 '괜찮으세요?'라고 큰 소리로 물어봐요." },
+      { id: 3, title: "3. 119 신고 및 AED 요청", desc: "주변의 특정 사람을 지목하여 119 신고와 AED를 요청해요." },
+      { id: 4, title: "4. 호흡 확인", desc: "가슴 움직임과 숨소리를 10초 이내로 관찰해요." },
+      { id: 5, title: "5. 가슴압박 실시", desc: "가슴 중앙에 두 손을 깍지 끼고 1분당 100~120회 속도로 깊게 눌러요." },
+      { id: 6, title: "6. AED 사용", desc: "전원을 켜고 패드를 붙인 뒤 음성 지시에 따라 심장 충격을 실시해요." },
+      { id: 7, title: "7. 구조대 도착까지 계속", desc: "119 구급대원이 현장에 도착하여 인계받을 때까지 계속 압박해요." }
+    ];
+    const steps = (window.CPR_STEPS && window.CPR_STEPS.length > 0) ? window.CPR_STEPS : defaultSteps;
     this.shuffledSteps = [...steps].sort(() => Math.random() - 0.5);
     this.userOrder = new Array(7).fill(null);
     this.timer = 60;
@@ -43,7 +52,7 @@ class Minigame1 {
   }
 
   handleTimeOut() {
-    audioManager.playWrong();
+    try { window.audioManager.playWrong(); } catch(e){}
     const modalOverlay = this.container.querySelector('#mg1-result-modal');
     const modalTitle = this.container.querySelector('#mg1-modal-title');
     const modalBody = this.container.querySelector('#mg1-modal-body');

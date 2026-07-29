@@ -56,7 +56,7 @@ const CPR_STEPS = [
   }
 ];
 
-export const JUDGMENT_QUIZZES = [
+const JUDGMENT_QUIZZES = [
   {
     id: 1,
     situation: "운동장에서 친구가 갑자기 쓰러졌습니다! 주변에 차나 운동기구가 있습니다.",
@@ -104,7 +104,7 @@ export const JUDGMENT_QUIZZES = [
   }
 ];
 
-export const BOSS_QUIZZES = [
+const BOSS_QUIZZES = [
   {
     id: 1,
     type: "choice",
