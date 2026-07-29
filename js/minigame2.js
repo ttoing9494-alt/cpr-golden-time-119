@@ -127,17 +127,17 @@ class Minigame2 {
   bindEvents() {
     const btns = this.container.querySelectorAll('.option-btn');
     btns.forEach(btn => {
-      const handler = (e) => {
-        e.preventDefault();
+      btn.addEventListener('click', () => {
         const idx = parseInt(btn.getAttribute('data-idx'));
-        this.checkAnswer(idx);
-      };
-      btn.addEventListener('click', handler);
-      btn.addEventListener('touchend', handler);
+        if (!isNaN(idx)) {
+          this.checkAnswer(idx);
+        }
+      });
     });
   }
 
   checkAnswer(selectedIdx) {
+    if (selectedIdx === null || selectedIdx === undefined || isNaN(selectedIdx)) return;
     if (this.selectedIdx !== null) return; // 이미 답변 선택함
     this.selectedIdx = selectedIdx;
 

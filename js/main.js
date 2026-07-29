@@ -184,6 +184,7 @@ class AppController {
 
       if (unlocked) {
         bossBtn.removeAttribute('disabled');
+        bossBtn.disabled = false;
         bossBtn.classList.remove('locked-btn');
         bossBtn.classList.add('btn-primary');
         bossBtn.style.cursor = 'pointer';
@@ -192,11 +193,20 @@ class AppController {
         bossBtn.style.color = '';
         bossBtn.style.border = '';
         bossBtn.style.filter = '';
+        bossBtn.onclick = (e) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          this.navigateTo('boss-view');
+        };
         bossBtn.innerHTML = isAdminMode()
           ? `⚡ [ADMIN] 보스전 바로 입장`
           : `⚔️ 보스전 : 생명을 살리는 사랑의 깍지 (입장 가능)`;
       } else {
         bossBtn.setAttribute('disabled', 'true');
+        bossBtn.disabled = true;
+        bossBtn.onclick = null;
         bossBtn.classList.remove('btn-primary');
         bossBtn.classList.add('locked-btn'); // 미완료 시 회색 비활성화 버튼
         bossBtn.style.cursor = 'not-allowed';
