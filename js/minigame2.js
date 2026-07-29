@@ -129,6 +129,13 @@ class Minigame2 {
     btns.forEach(btn => {
       btn.onclick = (e) => {
         if (e) e.preventDefault();
+
+        // 이미 답변을 선택한 상태에서 다시 누르면 즉시 다음 문제 이동
+        if (this.selectedIdx !== null) {
+          this.nextQuestion();
+          return;
+        }
+
         const idx = parseInt(btn.getAttribute('data-idx'));
         if (!isNaN(idx)) {
           this.checkAnswer(idx);
@@ -139,7 +146,10 @@ class Minigame2 {
 
   checkAnswer(selectedIdx) {
     if (selectedIdx === null || selectedIdx === undefined || isNaN(selectedIdx)) return;
-    if (this.selectedIdx !== null) return; // 이미 답변 선택함
+    if (this.selectedIdx !== null) {
+      this.nextQuestion();
+      return;
+    }
 
     const quizzes = window.JUDGMENT_QUIZZES || [];
     const quiz = quizzes[this.currentIndex];
@@ -161,7 +171,6 @@ class Minigame2 {
     if (optionsBox) {
       const btns = optionsBox.querySelectorAll('.option-btn');
       btns.forEach((btn, idx) => {
-        btn.disabled = true;
         if (idx === selectedIdx) {
           btn.style.border = selectedOption.correct ? '3px solid #22c55e' : '3px solid #ef4444';
           btn.style.background = selectedOption.correct ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
@@ -174,13 +183,14 @@ class Minigame2 {
     if (feedbackBox) {
       feedbackBox.style.display = 'block';
       feedbackBox.innerHTML = `
-        <div class="feedback-card" style="background: ${selectedOption.correct ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}; border: 2px solid ${selectedOption.correct ? '#22c55e' : '#ef4444'}; padding: 18px; border-radius: 14px; margin-bottom: 20px;">
+        <div class="feedback-card" onclick="window.activeMg2.nextQuestion()" style="background: ${selectedOption.correct ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}; border: 2px solid ${selectedOption.correct ? '#22c55e' : '#ef4444'}; padding: 18px; border-radius: 14px; margin-bottom: 20px; cursor: pointer;">
           <h3 style="color: ${selectedOption.correct ? '#4ade80' : '#f87171'}; font-size: 20px; font-weight: 800; margin-bottom: 8px;">
             ${selectedOption.correct ? '⭕ 정답입니다! 훌륭한 판단이에요!' : '❌ 잘못된 판단입니다!'}
           </h3>
           <p style="color: #f8fafc; font-size: 16px; line-height: 1.5; font-weight: 600;">
             ${selectedOption.reason}
           </p>
+          <div style="font-size: 13px; color: #facc15; font-weight: 700; margin-top: 8px;">👉 카드나 아래 버튼을 누르시면 즉시 다음 문제로 넘어갑니다!</div>
         </div>
 
         <button id="mg2-next-btn" class="btn btn-primary btn-large" onclick="if(window.activeMg2) window.activeMg2.nextQuestion()" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
@@ -193,11 +203,11 @@ class Minigame2 {
       } catch(e){}
     }
 
-    // 0.9초 후 자동 다음 문제 이동
+    // 0.6초 후 자동 다음 문제 이동
     if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
     this.autoNextTimeout = setTimeout(() => {
       this.nextQuestion();
-    }, 900);
+    }, 600);
   }
 
   nextQuestion() {
