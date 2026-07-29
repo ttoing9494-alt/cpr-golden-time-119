@@ -75,7 +75,8 @@ class BossGame {
     }
 
     // 위치에 맞춰 가장 가까운 선택지 타겟 자동 조준
-    const quiz = BOSS_QUIZZES[this.currentIndex];
+    const quizzes = window.BOSS_QUIZZES || [];
+    const quiz = quizzes[this.currentIndex];
     if (!quiz) return;
     const optionCount = quiz.options.length;
     const stepPercent = 80 / Math.max(1, optionCount - 1);
@@ -140,7 +141,13 @@ class BossGame {
   }
 
   render() {
-    const quiz = BOSS_QUIZZES[this.currentIndex];
+    const quizzes = window.BOSS_QUIZZES || [];
+    const quiz = quizzes[this.currentIndex] || {
+      question: "CPR 1단계 행동은?",
+      options: ["의식확인", "119신고", "주변안전확인", "가슴압박"],
+      answer: 2,
+      explanation: "주변 안전을 확인해야 2차 사고를 방지합니다."
+    };
     const heroLevel = this.correctCount + 1;
     const bossStatus = this.bossHP > 70 ? '👻 저승사자의 기운' : this.bossHP > 30 ? '💢 충격받은 저승사자' : '💀 퇴치 직전!';
 
@@ -154,7 +161,7 @@ class BossGame {
         <div class="boss-header">
           <div class="boss-title-tag">⚔️ 3D 아케이드 보스전 : 생명을 살리는 사랑의 깍지</div>
           <div class="boss-timer-box">⏱️ BATTLE TIME: <span id="boss-timer-display">${this.elapsedSeconds}초</span></div>
-          <div class="boss-stage-count">ROUND ${this.currentIndex + 1} / ${BOSS_QUIZZES.length}</div>
+          <div class="boss-stage-count">ROUND ${this.currentIndex + 1} / ${quizzes.length}</div>
         </div>
 
         <!-- 3D 보스전 아케이드 아레나 -->
@@ -277,7 +284,8 @@ class BossGame {
       target.addEventListener('click', () => {
         const idx = parseInt(target.getAttribute('data-idx'));
         this.selectedTargetIdx = idx;
-        const quiz = BOSS_QUIZZES[this.currentIndex];
+        const quizzes = window.BOSS_QUIZZES || [];
+        const quiz = quizzes[this.currentIndex];
         const stepPercent = quiz.options.length === 1 ? 0 : 80 / (quiz.options.length - 1);
         this.heroPosPercent = 10 + idx * stepPercent;
         const heroEl = this.container.querySelector('#arcade-hero-ship');
@@ -311,7 +319,8 @@ class BossGame {
   }
 
   handleAnswer(selectedIdx) {
-    const quiz = BOSS_QUIZZES[this.currentIndex];
+    const quizzes = window.BOSS_QUIZZES || [];
+    const quiz = quizzes[this.currentIndex];
     const isCorrect = selectedIdx === quiz.answer;
 
     const modalOverlay = this.container.querySelector('#boss-feedback-modal');
@@ -368,13 +377,16 @@ class BossGame {
     this.updateGauges();
 
     modalNext.onclick = () => {
+      const quizzes = window.BOSS_QUIZZES || [];
       modalOverlay.classList.add('hidden');
       this.currentIndex++;
 
-      if (this.bossHP <= 0 || this.currentIndex >= BOSS_QUIZZES.length) {
-        this.finishBossBattle();
-      } else if (this.playerHP <= 0) {
-        this.failBossBattle();
+      if (this.bossHP <= 0 || this.currentIndex >= quizzes.length) {
+        if (this.bossHP <= 0 || this.correctCount >= 6) {
+          this.winBossBattle();
+        } else {
+          this.failBossBattle();
+        }
       } else {
         this.render();
       }

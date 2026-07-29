@@ -14,7 +14,8 @@ class Minigame1 {
   }
 
   init() {
-    this.shuffledSteps = [...CPR_STEPS].sort(() => Math.random() - 0.5);
+    const steps = window.CPR_STEPS || [];
+    this.shuffledSteps = [...steps].sort(() => Math.random() - 0.5);
     this.userOrder = new Array(7).fill(null);
     this.timer = 60;
     this.render();
@@ -387,7 +388,7 @@ class Minigame1 {
         <div class="explanation-box warning-box">
           <h4>📌 올바른 CPR 7단계 순서 안내:</h4>
           <ol>
-            ${CPR_STEPS.map(s => `<li>${s.title} (${s.desc})</li>`).join('')}
+            ${(window.CPR_STEPS || []).map(s => `<li>${s.title} (${s.desc})</li>`).join('')}
           </ol>
         </div>
         <p>순서를 잘 확인하고 다시 한번 시도해 보세요!</p>

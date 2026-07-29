@@ -247,42 +247,46 @@ class AppController {
         this.renderHomeProgress();
       } else if (viewId === 'minigame1-view') {
         const container = document.getElementById('mg1-container');
-        if (container) {
-          this.currentGame = new Minigame1(container, () => {
+        if (container && window.Minigame1) {
+          this.currentGame = new window.Minigame1(container, () => {
             this.navigateTo('home-view');
           });
           this.currentGame.init();
         }
       } else if (viewId === 'minigame2-view') {
         const container = document.getElementById('mg2-container');
-        if (container) {
-          this.currentGame = new Minigame2(container, () => {
+        if (container && window.Minigame2) {
+          this.currentGame = new window.Minigame2(container, () => {
             this.navigateTo('home-view');
           });
           this.currentGame.init();
         }
       } else if (viewId === 'minigame3-view') {
         const container = document.getElementById('mg3-container');
-        if (container) {
-          this.currentGame = new Minigame3(container, () => {
+        if (container && window.Minigame3) {
+          this.currentGame = new window.Minigame3(container, () => {
             this.navigateTo('home-view');
           });
           this.currentGame.init();
         }
       } else if (viewId === 'boss-view') {
         const container = document.getElementById('boss-container');
-        if (container) {
-          this.currentGame = new BossGame(container, () => {
+        if (container && window.BossGame) {
+          this.currentGame = new window.BossGame(container, () => {
             this.navigateTo('hall-view');
           }, isAdminMode());
           this.currentGame.init();
         }
       } else if (viewId === 'hall-view') {
         const container = document.getElementById('hall-container');
-        if (container) hallOfFameManager.renderHallOfFamePage(container);
+        if (container && window.hallOfFameManager) {
+          window.hallOfFameManager.renderHallOfFamePage(container);
+        }
       } else if (viewId === 'achievements-view') {
         const container = document.getElementById('achievements-container');
-        if (container) achievementsManager.renderAchievementsPage(container);
+        if (container && window.achievementsManager) {
+          window.achievementsManager.renderAchievementsPage(container);
+        }
       } else if (viewId === 'guide-view') {
         this.renderGuidePage();
       }
@@ -297,7 +301,6 @@ class AppController {
       sec.classList.add('hidden');
       sec.style.display = 'none';
     });
-    // 모달은 인라인 스타일 차단 없이 classList로만 관리
     document.querySelectorAll('.modal-overlay:not(#auth-modal)').forEach(modal => {
       modal.classList.add('hidden');
     });
@@ -312,24 +315,27 @@ class AppController {
   }
 
   renderHomeProgress() {
-    const progress = storage.getProgress();
+    const progress = window.storage ? window.storage.getProgress() : { minigame1Cleared: false, minigame2Cleared: false, minigame3Cleared: false };
     const mg1Card = document.getElementById('mg1-status-card');
     const mg2Card = document.getElementById('mg2-status-card');
     const mg3Card = document.getElementById('mg3-status-card');
 
     if (mg1Card) {
       mg1Card.className = `game-select-card card-panel ${progress.minigame1Cleared ? 'cleared' : ''}`;
-      mg1Card.querySelector('.card-badge').textContent = progress.minigame1Cleared ? '완료됨 (30 Gold 획득)' : '미완료 (+30 Gold)';
+      const badge = mg1Card.querySelector('.card-badge');
+      if (badge) badge.textContent = progress.minigame1Cleared ? '완료됨 (30 Gold 획득)' : '미완료 (+30 Gold)';
     }
 
     if (mg2Card) {
       mg2Card.className = `game-select-card card-panel ${progress.minigame2Cleared ? 'cleared' : ''}`;
-      mg2Card.querySelector('.card-badge').textContent = progress.minigame2Cleared ? '완료됨 (30 Gold 획득)' : '미완료 (+30 Gold)';
+      const badge = mg2Card.querySelector('.card-badge');
+      if (badge) badge.textContent = progress.minigame2Cleared ? '완료됨 (30 Gold 획득)' : '미완료 (+30 Gold)';
     }
 
     if (mg3Card) {
       mg3Card.className = `game-select-card card-panel ${progress.minigame3Cleared ? 'cleared' : ''}`;
-      mg3Card.querySelector('.card-badge').textContent = progress.minigame3Cleared ? '완료됨 (40 Gold 획득)' : '미완료 (+40 Gold)';
+      const badge = mg3Card.querySelector('.card-badge');
+      if (badge) badge.textContent = progress.minigame3Cleared ? '완료됨 (40 Gold 획득)' : '미완료 (+40 Gold)';
     }
   }
 
@@ -337,20 +343,21 @@ class AppController {
     const container = document.getElementById('guide-container');
     if (!container) return;
 
+    const steps = window.CPR_STEPS || [];
     container.innerHTML = `
-      <div class="guide-wrapper card-panel">
-        <h2 class="section-title"><span class="icon">📖</span> 심폐소생술(CPR) 완벽 게임 가이드</h2>
-        <p class="section-desc">초등학교 5학년이 알아야 할 대한심폐소생협회 최신 지침 7단계를 익혀보세요!</p>
+      <div class="guide-wrapper card-panel" style="padding: 20px;">
+        <h2 class="section-title" style="font-size: 24px; color: #38bdf8; margin-bottom: 8px;"><span class="icon">📖</span> 심폐소생술(CPR) 완벽 게임 가이드</h2>
+        <p class="section-desc" style="color: #cbd5e1; margin-bottom: 24px;">초등학교 5학년이 알아야 할 대한심폐소생협회 최신 지침 7단계를 익혀보세요!</p>
 
         <div class="guide-steps-grid">
-          ${CPR_STEPS.map(step => `
-            <div class="guide-step-card card-panel">
-              <div class="step-num-badge">${step.id}단계</div>
-              <h3 class="step-title">${step.title}</h3>
-              <p class="step-desc">${step.desc}</p>
-              <div class="step-detail-box">
-                <strong>📌 핵심 교육 포인트:</strong>
-                <p>${step.detail}</p>
+          ${steps.map(step => `
+            <div class="guide-step-card card-panel" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.1); padding: 18px; border-radius: 14px; margin-bottom: 16px;">
+              <div class="step-num-badge" style="display: inline-block; background: var(--color-red-primary, #dc2626); color: white; padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 14px;">${step.id}단계</div>
+              <h3 class="step-title" style="margin: 12px 0 8px 0; color: #f8fafc; font-size: 20px; font-weight: 700;">${step.title}</h3>
+              <p class="step-desc" style="color: #e2e8f0; font-size: 15px; line-height: 1.6;">${step.desc}</p>
+              <div class="step-detail-box" style="margin-top: 12px; background: rgba(30,41,59,0.8); padding: 12px; border-radius: 8px; font-size: 14px; color: #94a3b8; border-left: 4px solid #38bdf8;">
+                <strong style="color: #38bdf8;">📌 핵심 교육 포인트:</strong>
+                <p style="margin-top: 4px; color: #cbd5e1;">${step.detail}</p>
               </div>
             </div>
           `).join('')}

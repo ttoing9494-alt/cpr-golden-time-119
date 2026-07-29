@@ -180,7 +180,7 @@ class Minigame3 {
     if (bpm >= 100 && bpm <= 120) {
       // PERFECT
       this.perfectHits++;
-      audioManager.playBeat(true);
+      try { window.audioManager.playBeat(true); } catch(e){}
       if (feedbackEl) {
         feedbackEl.textContent = 'PERFECT! (완벽한 속도)';
         feedbackEl.className = 'rhythm-tag tag-perfect';
@@ -188,21 +188,21 @@ class Minigame3 {
     } else if ((bpm >= 90 && bpm < 100) || (bpm > 120 && bpm <= 135)) {
       // GOOD
       this.goodHits++;
-      audioManager.playBeat(true);
+      try { window.audioManager.playBeat(true); } catch(e){}
       if (feedbackEl) {
         feedbackEl.textContent = 'GOOD (조금 더 집중!)';
         feedbackEl.className = 'rhythm-tag tag-good';
       }
     } else if (bpm < 90) {
       // TOO SLOW
-      audioManager.playBeat(false);
+      try { window.audioManager.playBeat(false); } catch(e){}
       if (feedbackEl) {
         feedbackEl.textContent = 'TOO SLOW (더 빠르게!)';
         feedbackEl.className = 'rhythm-tag tag-slow';
       }
     } else {
       // TOO FAST
-      audioManager.playBeat(false);
+      try { window.audioManager.playBeat(false); } catch(e){}
       if (feedbackEl) {
         feedbackEl.textContent = 'TOO FAST (너무 빨라요!)';
         feedbackEl.className = 'rhythm-tag tag-fast';
@@ -264,7 +264,7 @@ class Minigame3 {
     }
 
     if (totalValid === 0 || accuracy < 60) {
-      audioManager.playWrong();
+      try { window.audioManager.playWrong(); } catch(e){}
       this.container.innerHTML = `
         <div class="minigame-wrapper card-panel align-center">
           <div class="game-badge">미니게임 3 미완료</div>
@@ -288,19 +288,25 @@ class Minigame3 {
       return;
     }
 
-    audioManager.playVictory();
-    audioManager.playGold();
+    try {
+      window.audioManager.playVictory();
+      window.audioManager.playGold();
+    } catch(e){}
 
-    const curProgress = storage.getProgress();
-    if (!curProgress.minigame3Cleared) {
-      curProgress.minigame3Cleared = true;
-      curProgress.gold += 40;
-      storage.saveProgress(curProgress);
+    if (window.storage) {
+      const curProgress = window.storage.getProgress();
+      if (!curProgress.minigame3Cleared) {
+        curProgress.minigame3Cleared = true;
+        curProgress.gold += 40;
+        window.storage.saveProgress(curProgress);
+      }
     }
 
-    achievementsManager.checkAndUnlock('first_rescue');
-    if (accuracy >= 85) {
-      achievementsManager.checkAndUnlock('rhythm_master');
+    if (window.achievementsManager) {
+      window.achievementsManager.checkAndUnlock('first_cpr');
+      if (accuracy >= 85) {
+        window.achievementsManager.checkAndUnlock('rhythm_master');
+      }
     }
 
     this.container.innerHTML = `
