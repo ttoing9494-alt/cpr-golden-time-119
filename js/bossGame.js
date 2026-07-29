@@ -294,28 +294,6 @@ class BossGame {
         this.fireAEDShock();
       });
     });
-  }el hud-modal">
-            <h3 id="boss-modal-title" class="modal-title"></h3>
-            <div id="boss-modal-body" class="modal-body"></div>
-            <div class="btn-group align-center">
-              <button id="boss-modal-next" class="btn btn-primary btn-large">다음 라운드 진행 ⚔️</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    this.bindEvents();
-  }
-
-  bindEvents() {
-    const btns = this.container.querySelectorAll('.boss-opt-btn');
-    btns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.getAttribute('data-idx'));
-        this.handleAnswer(idx);
-      });
-    });
   }
 
   handleAnswer(selectedIdx) {
@@ -407,92 +385,106 @@ class BossGame {
     if (patientVitalFill) patientVitalFill.style.width = `${this.patientVital}%`;
   }
 
+  winBossBattle() {
+    this.finishBossBattle();
+  }
+
   finishBossBattle() {
     this.stopBossTimer();
     const bossTimeSec = Math.max(1, this.elapsedSeconds);
-    const accuracy = Math.round((this.correctCount / BOSS_QUIZZES.length) * 100);
+    const quizzes = window.BOSS_QUIZZES || [];
+    const accuracy = Math.round((this.correctCount / Math.max(1, quizzes.length)) * 100);
     const score = (this.correctCount * 100) + Math.max(0, 300 - bossTimeSec * 2);
 
-    audioManager.playVictory();
+    try { window.audioManager.playVictory(); } catch(e){}
 
-    achievementsManager.checkAndUnlock('first_rescue');
-    achievementsManager.checkAndUnlock('hero_savior');
+    if (window.achievementsManager) {
+      window.achievementsManager.checkAndUnlock('first_cpr');
+      window.achievementsManager.checkAndUnlock('hero_savior');
+    }
 
     this.container.innerHTML = `
-      <div class="boss-victory-wrapper card-panel align-center animate-fade-in">
+      <div class="boss-victory-wrapper card-panel align-center animate-fade-in" style="padding: 24px;">
         <div class="victory-header">
-          <span class="victory-crown">👑</span>
-          <h2 class="victory-title">생명을 구했습니다! 구조 성공!</h2>
-          <p class="victory-sub">어둠의 저승사자를 물리치고 사랑의 깍지로 소중한 생명을 지켜냈습니다!</p>
+          <span class="victory-crown" style="font-size: 48px;">👑</span>
+          <h2 class="victory-title" style="color: #4ade80; font-size: 28px; margin: 12px 0;">생명을 구했습니다! 구조 성공!</h2>
+          <p class="victory-sub" style="color: #f8fafc; font-size: 16px; margin-bottom: 20px;">어둠의 저승사자를 물리치고 사랑의 깍지로 소중한 생명을 지켜냈습니다!</p>
         </div>
 
-        <div class="result-stats-card card-panel">
-          <h3>📊 최종 구조 성과 리포트</h3>
-          <div class="stats-grid">
-            <div class="stat-item">
-              <span class="stat-lbl">최종 점수</span>
-              <span class="stat-val highlight-val">${score}점</span>
+        <div class="result-stats-card card-panel" style="background: rgba(15,23,42,0.9); border: 2px solid #38bdf8; padding: 20px; border-radius: 16px; margin-bottom: 24px;">
+          <h3 style="color: #38bdf8; font-size: 18px; margin-bottom: 14px;">📊 최종 구조 성과 리포트</h3>
+          <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="stat-item" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
+              <span class="stat-lbl" style="color: #94a3b8; font-size: 13px; display: block;">최종 점수</span>
+              <span class="stat-val highlight-val" style="color: #facc15; font-size: 22px; font-weight: 800;">${score}점</span>
             </div>
-            <div class="stat-item">
-              <span class="stat-lbl">정답률</span>
-              <span class="stat-val">${accuracy}%</span>
+            <div class="stat-item" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
+              <span class="stat-lbl" style="color: #94a3b8; font-size: 13px; display: block;">정답률</span>
+              <span class="stat-val" style="color: #38bdf8; font-size: 22px; font-weight: 800;">${accuracy}%</span>
             </div>
-            <div class="stat-item">
-              <span class="stat-lbl">⏱️ 보스 도전 시간</span>
-              <span class="stat-val success-text">${bossTimeSec}초</span>
+            <div class="stat-item" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
+              <span class="stat-lbl" style="color: #94a3b8; font-size: 13px; display: block;">⏱️ 보스 도전 시간</span>
+              <span class="stat-val success-text" style="color: #4ade80; font-size: 22px; font-weight: 800;">${bossTimeSec}초</span>
             </div>
-            <div class="stat-item">
-              <span class="stat-lbl">환자 최종 생명력</span>
-              <span class="stat-val success-text">100% 회복</span>
+            <div class="stat-item" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
+              <span class="stat-lbl" style="color: #94a3b8; font-size: 13px; display: block;">환자 최종 생명력</span>
+              <span class="stat-val success-text" style="color: #4ade80; font-size: 22px; font-weight: 800;">100% 회복</span>
             </div>
           </div>
         </div>
 
         <!-- 명예의 전당 입력 폼 -->
-        <div class="hall-input-card card-panel">
-          <h4>🏆 명예의 전당에 이름을 새기세요</h4>
-          <div class="name-input-group">
-            <input type="text" id="hero-name-input" class="text-input" placeholder="구조사 이름을 입력하세요 (예: 5학년 홍길동)" maxlength="10">
-            <button id="save-hall-btn" class="btn btn-primary">기록 등록하기</button>
+        <div class="hall-input-card card-panel" style="background: rgba(30,41,59,0.9); padding: 20px; border-radius: 16px; margin-bottom: 24px;">
+          <h4 style="color: #facc15; font-size: 17px; margin-bottom: 12px;">🏆 명예의 전당에 이름을 새기세요</h4>
+          <div class="name-input-group" style="display: flex; gap: 10px; justify-content: center;">
+            <input type="text" id="hero-name-input" class="text-input" placeholder="구조사 이름을 입력하세요 (예: 5학년 홍길동)" maxlength="10" style="padding: 12px; border-radius: 10px; border: 1px solid #38bdf8; background: #0f172a; color: white; flex: 1; max-width: 280px;">
+            <button id="save-hall-btn" class="btn btn-primary" style="padding: 12px 20px; font-weight: 800;">기록 등록하기</button>
           </div>
         </div>
       </div>
     `;
 
-    this.container.querySelector('#save-hall-btn').addEventListener('click', () => {
-      const nameInput = this.container.querySelector('#hero-name-input');
-      const heroName = nameInput.value.trim() || '무명 구조사';
+    const saveBtn = this.container.querySelector('#save-hall-btn');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        const nameInput = this.container.querySelector('#hero-name-input');
+        const heroName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : '무명 구조사';
+        const today = new Date().toISOString().split('T')[0];
 
-      const today = new Date().toISOString().split('T')[0];
-      firestoreManager.saveHallOfFameRecord({
-        name: heroName,
-        score: score,
-        playTime: bossTimeSec, // 보스 도전 시간
-        accuracy: accuracy,
-        date: today
+        if (window.hallOfFameManager && typeof window.hallOfFameManager.addRecord === 'function') {
+          window.hallOfFameManager.addRecord({
+            name: heroName,
+            score: score,
+            time: `${bossTimeSec}초`,
+            date: today
+          });
+        }
+
+        try { window.audioManager.playGold(); } catch(e){}
+        alert(`🏆 보스 도전 시간 ${bossTimeSec}초 기록이 명예의 전당에 등록되었습니다!`);
+        if (this.onComplete) this.onComplete();
       });
-
-      audioManager.playGold();
-      alert(`🏆 보스 도전 시간 ${bossTimeSec}초 기록이 명예의 전당에 등록되었습니다!`);
-      if (this.onComplete) this.onComplete();
-    });
+    }
   }
 
   failBossBattle() {
     this.stopBossTimer();
-    audioManager.playWrong();
+    try { window.audioManager.playWrong(); } catch(e){}
     this.container.innerHTML = `
-      <div class="boss-fail-wrapper card-panel align-center">
-        <h2 class="error-text">❌ 구조 실패... 집중력이 다했습니다</h2>
-        <p class="section-desc">저승사자의 기운에 눌렸습니다. CPR 순서와 지식을 다시 복습하고 도전해보세요!</p>
+      <div class="boss-fail-wrapper card-panel align-center" style="padding: 24px;">
+        <h2 class="error-text" style="color: #f87171; font-size: 26px; margin-bottom: 12px;">❌ 구조 실패... 집중력이 다했습니다</h2>
+        <p class="section-desc" style="color: #cbd5e1; margin-bottom: 24px;">저승사자의 기운에 눌렸습니다. CPR 순서와 지식을 다시 복습하고 도전해보세요!</p>
         
-        <button id="boss-retry-btn" class="btn btn-primary btn-large">🔄 보스전 다시 도전하기</button>
+        <button id="boss-retry-btn" class="btn btn-primary btn-large" style="padding: 16px 28px; font-size: 18px; font-weight: 800;">🔄 보스전 다시 도전하기</button>
       </div>
     `;
 
-    this.container.querySelector('#boss-retry-btn').addEventListener('click', () => {
-      this.init();
-    });
+    const retryBtn = this.container.querySelector('#boss-retry-btn');
+    if (retryBtn) {
+      retryBtn.addEventListener('click', () => {
+        this.init();
+      });
+    }
   }
 }
 
