@@ -140,12 +140,12 @@ class Minigame2 {
   checkAnswer(selectedIdx) {
     if (selectedIdx === null || selectedIdx === undefined || isNaN(selectedIdx)) return;
     if (this.selectedIdx !== null) return; // 이미 답변 선택함
-    this.selectedIdx = selectedIdx;
 
     const quizzes = window.JUDGMENT_QUIZZES || [];
     const quiz = quizzes[this.currentIndex];
-    if (!quiz) return;
+    if (!quiz || !quiz.options || !quiz.options[selectedIdx]) return;
 
+    this.selectedIdx = selectedIdx;
     const selectedOption = quiz.options[selectedIdx];
     const feedbackBox = this.container.querySelector('#mg2-inline-feedback');
     const optionsBox = this.container.querySelector('#mg2-options-box');
@@ -162,7 +162,6 @@ class Minigame2 {
       const btns = optionsBox.querySelectorAll('.option-btn');
       btns.forEach((btn, idx) => {
         btn.disabled = true;
-        btn.onclick = null; // 중복 클릭 차단
         if (idx === selectedIdx) {
           btn.style.border = selectedOption.correct ? '3px solid #22c55e' : '3px solid #ef4444';
           btn.style.background = selectedOption.correct ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
@@ -184,29 +183,21 @@ class Minigame2 {
           </p>
         </div>
 
-        <button id="mg2-next-btn" class="btn btn-primary btn-large" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
-          다음 문제로 이동하기 ➡️
+        <button id="mg2-next-btn" class="btn btn-primary btn-large" onclick="if(window.activeMg2) window.activeMg2.nextQuestion()" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+          다음 문제로 즉시 이동 ➡️
         </button>
       `;
-
-      const nextBtn = feedbackBox.querySelector('#mg2-next-btn');
-      if (nextBtn) {
-        nextBtn.onclick = (e) => {
-          if (e) e.preventDefault();
-          this.nextQuestion();
-        };
-      }
 
       try {
         feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } catch(e){}
     }
 
-    // 1.5초 후 자동 다음 문제 이동
+    // 0.9초 후 자동 다음 문제 이동
     if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
     this.autoNextTimeout = setTimeout(() => {
       this.nextQuestion();
-    }, 1500);
+    }, 900);
   }
 
   nextQuestion() {
