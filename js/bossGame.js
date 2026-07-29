@@ -9,7 +9,7 @@ class BossGame {
   constructor(containerEl, onCompleteCallback, adminMode = false) {
     this.container = containerEl;
     this.onComplete = onCompleteCallback;
-    this.adminMode = adminMode; // 관리자 모드 플래그
+    this.adminMode = adminMode;
     this.bossHP = 100;
     this.playerHP = 100;
     this.patientVital = 30;
@@ -17,10 +17,14 @@ class BossGame {
     this.correctCount = 0;
     this.startTime = 0;
 
-    // 아케이드 슈팅 플레이어 상태 (Hero Position: 0 ~ 100%)
+    // 아케이드 슈팅 플레이어 & 방해물/미사일 상태
     this.heroPosPercent = 50; 
     this.selectedTargetIdx = 0;
     this.keyListener = null;
+    this.obstacles = [];
+    this.projectiles = [];
+    this.physicsInterval = null;
+    this.spawnInterval = null;
   }
 
   init() {
@@ -30,9 +34,12 @@ class BossGame {
     this.currentIndex = 0;
     this.correctCount = 0;
     this.heroPosPercent = 50;
+    this.obstacles = [];
+    this.projectiles = [];
     this.startTime = Date.now();
     this.elapsedSeconds = 0;
     this.startBossTimer();
+    this.startArcadePhysics();
     this.bindKeyboardControls();
     this.render();
   }
@@ -43,7 +50,6 @@ class BossGame {
     }
 
     this.keyListener = (e) => {
-      // 보스전 화면이 아닐 때는 키 작동 중단
       const bossView = document.getElementById('boss-view');
       if (!bossView || bossView.classList.contains('hidden')) return;
 
@@ -74,12 +80,11 @@ class BossGame {
       heroEl.style.left = `${this.heroPosPercent}%`;
     }
 
-    // 위치에 맞춰 가장 가까운 선택지 타겟 자동 조준
     const quizzes = window.BOSS_QUIZZES || [];
     const quiz = quizzes[this.currentIndex];
     if (!quiz) return;
     const optionCount = quiz.options.length;
-    const stepPercent = 80 / Math.max(1, optionCount - 1);
+    const stepPercent = optionCount === 1 ? 0 : 80 / Math.max(1, optionCount - 1);
     
     let closestIdx = 0;
     let minDiff = 999;
@@ -115,10 +120,126 @@ class BossGame {
       setTimeout(() => heroEl.classList.remove('hero-shooting'), 300);
     }
 
-    audioManager.playBeat(true);
+    try { window.audioManager.playBeat(true); } catch(e){}
 
-    // 조준된 선택지로 AED 전기 충격파 처리
-    this.handleAnswer(this.selectedTargetIdx);
+    const quizzes = window.BOSS_QUIZZES || [];
+    const quiz = quizzes[this.currentIndex];
+    if (!quiz) return;
+    const optionCount = quiz.options.length;
+    const stepPercent = optionCount === 1 ? 0 : 80 / Math.max(1, optionCount - 1);
+    const targetLeft = optionCount === 1 ? 50 : 10 + this.selectedTargetIdx * stepPercent;
+
+    // AED 미사일 생성 (Hero 위치에서 조준 타겟으로 날아감)
+    this.projectiles.push({
+      id: Date.now() + Math.random(),
+      startX: this.heroPosPercent,
+      startY: 75,
+      currentX: this.heroPosPercent,
+      currentY: 75,
+      targetX: targetLeft,
+      targetY: 20,
+      progress: 0,
+      targetIdx: this.selectedTargetIdx
+    });
+  }
+
+  startArcadePhysics() {
+    if (this.physicsInterval) clearInterval(this.physicsInterval);
+    if (this.spawnInterval) clearInterval(this.spawnInterval);
+
+    // 1.5초마다 저승사자 방해물 생성
+    this.spawnInterval = setInterval(() => {
+      const bossView = document.getElementById('boss-view');
+      if (!bossView || bossView.classList.contains('hidden')) return;
+
+      const types = ['👻', '💀', '⚡', '💣'];
+      this.obstacles.push({
+        id: Date.now() + Math.random(),
+        x: Math.random() * 80 + 10,
+        y: 15,
+        speed: Math.random() * 1.5 + 1.2,
+        icon: types[Math.floor(Math.random() * types.length)]
+      });
+    }, 1500);
+
+    // 물리 및 이동 루프 (60FPS 모사)
+    this.physicsInterval = setInterval(() => {
+      const bossView = document.getElementById('boss-view');
+      if (!bossView || bossView.classList.contains('hidden')) return;
+
+      this.updateArcadePhysics();
+    }, 40);
+  }
+
+  updateArcadePhysics() {
+    const arenaEl = this.container.querySelector('.arcade-quiz-zone');
+    if (!arenaEl) return;
+
+    let overlayContainer = arenaEl.querySelector('#arcade-bullets-overlay');
+    if (!overlayContainer) {
+      overlayContainer = document.createElement('div');
+      overlayContainer.id = 'arcade-bullets-overlay';
+      overlayContainer.style.position = 'absolute';
+      overlayContainer.style.top = '0';
+      overlayContainer.style.left = '0';
+      overlayContainer.style.width = '100%';
+      overlayContainer.style.height = '100%';
+      overlayContainer.style.pointerEvents = 'none';
+      overlayContainer.style.zIndex = '20';
+      arenaEl.appendChild(overlayContainer);
+    }
+
+    // 1. 방해물 이동 및 충돌 체크
+    for (let i = this.obstacles.length - 1; i >= 0; i--) {
+      const obs = this.obstacles[i];
+      obs.y += obs.speed;
+
+      // 영웅 히어로와 충돌 체크 (y: 65~85%, x: ±10%)
+      if (obs.y >= 65 && obs.y <= 85 && Math.abs(obs.x - this.heroPosPercent) < 12) {
+        // 방해물 충돌!
+        this.obstacles.splice(i, 1);
+        this.playerHP = Math.max(0, this.playerHP - 8);
+        this.patientVital = Math.max(0, this.patientVital - 3);
+        this.updateGauges();
+
+        try { window.audioManager.playWrong(); } catch(e){}
+        document.body.classList.add('warning-red-flash');
+        setTimeout(() => document.body.classList.remove('warning-red-flash'), 300);
+        continue;
+      }
+
+      // 화면 하단 이탈
+      if (obs.y > 90) {
+        this.obstacles.splice(i, 1);
+      }
+    }
+
+    // 2. AED 발사 미사일 이동 및 명중 체크
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const p = this.projectiles[i];
+      p.progress += 0.15; // 날아가는 속도
+      p.currentX = p.startX + (p.targetX - p.startX) * p.progress;
+      p.currentY = p.startY + (p.targetY - p.startY) * p.progress;
+
+      if (p.progress >= 1.0) {
+        // 미사일 타겟 명중!
+        const hitIdx = p.targetIdx;
+        this.projectiles.splice(i, 1);
+        this.handleAnswer(hitIdx);
+      }
+    }
+
+    // 3. 시각적 오버레이 렌더링
+    let html = '';
+    this.obstacles.forEach(obs => {
+      html += `<div style="position: absolute; left: ${obs.x}%; top: ${obs.y}%; font-size: 26px; transform: translate(-50%, -50%); filter: drop-shadow(0 0 10px #f43f5e); animation: spin 2s linear infinite;">${obs.icon}</div>`;
+    });
+
+    this.projectiles.forEach(p => {
+      html += `<div style="position: absolute; left: ${p.currentX}%; top: ${p.currentY}%; font-size: 32px; transform: translate(-50%, -50%); filter: drop-shadow(0 0 15px #facc15); font-weight: 900; color: #facc15;">⚡</div>`;
+    });
+
+    overlayContainer.innerHTML = html;
   }
 
   startBossTimer() {
@@ -136,6 +257,14 @@ class BossGame {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
+    }
+    if (this.physicsInterval) {
+      clearInterval(this.physicsInterval);
+      this.physicsInterval = null;
+    }
+    if (this.spawnInterval) {
+      clearInterval(this.spawnInterval);
+      this.spawnInterval = null;
     }
     this.unbindKeyboardControls();
   }
