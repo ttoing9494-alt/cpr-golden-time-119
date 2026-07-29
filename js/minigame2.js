@@ -182,19 +182,29 @@ class Minigame2 {
           </p>
         </div>
 
-        <button id="mg2-next-btn" class="btn btn-primary btn-large" onclick="window.activeMg2.nextQuestion()" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
-          다음 문제로 이동하기 ➡️ (자동 이동 중...)
+        <button id="mg2-next-btn" class="btn btn-primary btn-large" style="width: 100%; padding: 16px; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+          다음 문제로 이동하기 ➡️ (잠시 후 자동 이동)
         </button>
       `;
 
-      feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const nextBtn = feedbackBox.querySelector('#mg2-next-btn');
+      if (nextBtn) {
+        nextBtn.onclick = (e) => {
+          if (e) e.preventDefault();
+          this.nextQuestion();
+        };
+      }
+
+      try {
+        feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch(e){}
     }
 
-    // 1.5초 후 자동 다음 문제 이동
+    // 1.2초 후 자동 다음 문제 이동
     if (this.autoNextTimeout) clearTimeout(this.autoNextTimeout);
     this.autoNextTimeout = setTimeout(() => {
       this.nextQuestion();
-    }, 1600);
+    }, 1200);
   }
 
   nextQuestion() {

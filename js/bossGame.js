@@ -196,15 +196,20 @@ class BossGame {
 
       // 영웅 히어로와 충돌 체크 (y: 65~85%, x: ±10%)
       if (obs.y >= 65 && obs.y <= 85 && Math.abs(obs.x - this.heroPosPercent) < 12) {
-        // 방해물 충돌!
+        // 방해물 충돌! 구조사 집중력 HP & 환자 생명력 차감!
         this.obstacles.splice(i, 1);
-        this.playerHP = Math.max(0, this.playerHP - 8);
-        this.patientVital = Math.max(0, this.patientVital - 3);
+        this.playerHP = Math.max(0, this.playerHP - 10);
+        this.patientVital = Math.max(0, this.patientVital - 5);
         this.updateGauges();
 
         try { window.audioManager.playWrong(); } catch(e){}
         document.body.classList.add('warning-red-flash');
         setTimeout(() => document.body.classList.remove('warning-red-flash'), 300);
+
+        if (this.playerHP <= 0) {
+          this.failBossBattle();
+          return;
+        }
         continue;
       }
 
@@ -217,12 +222,12 @@ class BossGame {
     // 2. AED 발사 미사일 이동 및 명중 체크
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const p = this.projectiles[i];
-      p.progress += 0.15; // 날아가는 속도
+      p.progress += 0.2; // 미사일 비행 속도
       p.currentX = p.startX + (p.targetX - p.startX) * p.progress;
       p.currentY = p.startY + (p.targetY - p.startY) * p.progress;
 
       if (p.progress >= 1.0) {
-        // 미사일 타겟 명중!
+        // 미사일 타겟 명중! 정답 처리 진행!
         const hitIdx = p.targetIdx;
         this.projectiles.splice(i, 1);
         this.handleAnswer(hitIdx);
